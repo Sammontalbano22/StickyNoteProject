@@ -1,0 +1,393 @@
+/* Reset and base styles */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f5f5dc;
+  color: #333;
+}
+
+header {
+  background-color: #f4d35e;
+  padding: 1.5em;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+h1 {
+  margin: 0;
+  font-size: 2rem;
+  color: #4d2600;
+}
+
+#progress-bar {
+  height: 10px;
+  background: #ddd;
+  width: 80%;
+  margin: 10px auto;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+#progress-fill {
+  height: 100%;
+  width: 0%;
+  background: #44bba4;
+  transition: width 0.4s ease-in-out;
+}
+
+/* Layout */
+main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2em;
+  padding: 2em;
+  background: #e0cda9;
+  min-height: 100vh;
+}
+
+section {
+  background: #fffdf4;
+  padding: 1.5em;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+textarea,
+input {
+  width: 100%;
+  padding: 0.5em;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-top: 0.5em;
+  font-size: 1rem;
+}
+
+button {
+  margin-top: 0.5em;
+  padding: 0.6em 1.2em;
+  border: none;
+  background: #f4a261;
+  color: white;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #e76f51;
+}
+
+/* Sticky Board Styling */
+#sticky-board {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;
+  padding: 1em;
+  background-image: url('https://www.transparenttextures.com/patterns/cork-board.png');
+  border-radius: 10px;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+  min-height: 300px;
+}
+
+/* Realistic Sticky Note */
+.sticky-note {
+  width: 160px;
+  height: 160px;
+  background: #fff68f;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+  transform: rotate(-2deg);
+  padding: 1em;
+  font-size: 0.9rem;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  position: relative;
+  transition: transform 0.3s;
+}
+
+.sticky-note:hover {
+  transform: scale(1.05) rotate(0deg);
+  z-index: 2;
+}
+
+.sticky-note::before {
+  content: "";
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle, #b22222 40%, transparent 41%);
+  border-radius: 50%;
+  position: absolute;
+  top: -10px;
+  left: calc(50% - 10px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Counselor style */
+#counselor-message {
+  background: #d1f7ff;
+  border-left: 5px solid #4dabf7;
+  padding: 1em;
+  font-style: italic;
+  border-radius: 8px;
+  margin-top: 0.5em;
+}
+
+/* Milestone tracker */
+#milestone-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+#milestone-list li {
+  margin-bottom: 0.5em;
+}
+
+#milestone-list input[type="checkbox"] {
+  margin-right: 0.5em;
+}
+
+/* Sticky note pad input style */
+.note-pad {
+  position: relative;
+  background: #fff68f;
+  width: 180px;
+  height: 180px;
+  padding: 1em;
+  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  font-family: 'Patrick Hand', 'Comic Sans MS', cursive, sans-serif;
+  margin-bottom: 0.5em;
+  overflow: hidden;
+  resize: none;
+}
+
+.note-pad textarea {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  resize: none;
+  outline: none;
+  font-family: 'Patrick Hand', 'Comic Sans MS', cursive, sans-serif;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: #333;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+#suggestions {
+  grid-column: span 2;
+  background: #f9fbe7;
+  padding: 1em;
+  border-radius: 10px;
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.05);
+}
+
+.suggestion {
+  background: #fff;
+  margin: 0.5em 0;
+  padding: 0.75em;
+  border-left: 4px solid #44bba4;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.suggestion p {
+  margin: 0;
+  flex: 1;
+  font-size: 0.95rem;
+}
+
+.suggestion button {
+  margin-left: 0.5em;
+  padding: 0.3em 0.7em;
+  font-size: 0.8rem;
+  background: #ddd;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.suggestion button.accept {
+  background: #a8e6cf;
+}
+
+.suggestion button.reject {
+  background: #ff8b94;
+}
+
+.journal-entry {
+  background: #fff8dc;
+  padding: 10px;
+  margin: 10px 0;
+  border-left: 5px solid #f4d35e;
+  border-radius: 4px;
+}
+
+#goal-select {
+  margin: 0.5em 0;
+  padding: 0.3em;
+  font-family: inherit;
+}
+
+#auth-section {
+  padding: 1em;
+  background: #ffe4c4;
+  border: 1px solid #aaa;
+  margin: 1em;
+  border-radius: 10px;
+}
+
+#auth-section input {
+  display: block;
+  margin: 0.5em 0;
+  padding: 0.5em;
+}
+
+.goal-progress {
+  height: 8px;
+  background: #ddd;
+  border-radius: 5px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.goal-progress-fill {
+  height: 100%;
+  background: #44bba4;
+  width: 0%;
+  transition: width 0.4s ease;
+}
+
+/* Flip Card Layout */
+.flip-container {
+  perspective: 1000px;
+  width: 180px;
+  height: 180px;
+  position: relative;
+  transition: all 0.6s ease;
+}
+
+.flip-card {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+}
+
+.flip-container.flipped .flip-card {
+  transform: rotateY(180deg);
+}
+
+/* Front and Back */
+.card-front, .card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 5px;
+  padding: 1em;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.card-front {
+  z-index: 2;
+  transform: rotateY(0deg);
+}
+
+.card-back {
+  transform: rotateY(180deg);
+  transition: transform 0.8s;
+  z-index: 1;
+}
+
+/* Flipping */
+.flip-container.flipped .card-front {
+  display: none;
+}
+
+.flip-container.flipped .card-back {
+  transform: rotateY(180deg);
+  backface-visibility: hidden;
+}
+
+/* Fix flipped text when fullscreen back is active */
+.flip-container.flipped .card-back.fullscreen-back {
+  transform: none !important;
+  backface-visibility: visible !important;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  background: #fff68f;
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  padding: 2em;
+  overflow-y: auto;
+  position: absolute;
+  box-sizing: border-box;
+}
+
+/* Fullscreen flip container */
+.flip-container.flipped {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.flip-container.flipped .flip-card {
+  width: 100%;
+  height: 100%;
+}
+
+/* Back Button Style */
+.card-back button {
+  background: #f4a261;
+  border: none;
+  padding: 0.5em 1em;
+  color: white;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  align-self: flex-start;
+  margin-bottom: 1em;
+}
+
+.card-back button:hover {
+  background: #e76f51;
+}
+.sticky-note.complete-goal {
+      text-decoration: line-through;
+      opacity: 0.6;
+      position: relative;
+    }
+    li.done {
+      text-decoration: line-through;
+    }
+    .delete-btn {
+      margin-left: 10px;
+      color: red;
+      cursor: pointer;
+    }
+    .confetti {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+    }
+    .suggested-step {
+      margin-bottom: 8px;
+    }
+    .suggested-step button {
+      margin-left: 10px;
+    }

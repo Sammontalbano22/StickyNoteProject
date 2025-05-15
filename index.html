@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sticky Note Goal Tracker</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles/main.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <h1>🎯 My Long-Term Goal Board</h1>
+    <div id="progress-bar"><div id="progress-fill"></div></div>
+    <button id="btn-logout" style="display: none;">🚪 Sign Out</button>
+  </header>
+
+  <!-- Authentication UI -->
+  <div id="auth">
+    <input id="email" type="email" placeholder="Email" />
+    <input id="password" type="password" placeholder="Password" />
+    <button id="btn-signup">Sign Up</button>
+    <button id="btn-login">Log In</button>
+    <p id="auth-status"></p>
+  </div>
+
+  <!-- App Content -->
+  <div id="app-content" style="display:none;">
+    <main>
+      <!-- Goal Creation -->
+      <section id="goal-creator">
+        <h2>Write a New Goal</h2>
+        <div class="note-pad">
+          <textarea id="goal-input" placeholder="Write your sticky goal here..."></textarea>
+        </div>
+        <button onclick="addGoal()">📌 Pin Goal</button>
+      </section>
+
+      <!-- Goal Display -->
+      <section id="goal-board">
+        <h2>Pinned Goals</h2>
+        <div id="sticky-board"></div>
+      </section>
+
+      <!-- AI Suggestions -->
+      <section id="suggestions">
+        <h2>AI Suggested Steps</h2>
+        <div id="suggested-goals"></div>
+      </section>
+
+      <!-- Daily Journal -->
+      <section id="daily-journal">
+        <h2>Daily Progress Questions</h2>
+        <label for="goal-select">Which goal are you reflecting on?</label>
+        <select id="goal-select"><option value="">-- Select a goal --</option></select>
+        <p id="daily-question">What’s one thing you did today to move toward your goal?</p>
+        <textarea id="daily-answer" placeholder="Write your reflection..."></textarea>
+        <button onclick="submitAnswer()">Submit</button>
+      </section>
+
+      <button onclick="loadJournal()">📖 View Journal</button>
+      <div id="journal-section"></div>
+
+      <!-- Milestone Tracker -->
+      <section id="milestones">
+        <h2>Milestone Tracker</h2>
+        <ul id="milestone-list"></ul>
+
+        <label for="milestone-goal-select">Attach to goal:</label>
+        <select id="milestone-goal-select"><option value="">-- Select a goal --</option></select>
+
+        <input id="milestone-input" placeholder="Add milestone..." />
+        <button onclick="addMilestone()">Add</button>
+      </section>
+
+      <!-- Counselor Message -->
+      <section id="counselor">
+        <h2>👩‍🏫 Progress Counselor</h2>
+        <div id="counselor-message">Welcome! Let’s keep moving forward 💪</div>
+      </section>
+    </main>
+  </div>
+
+ 
+  <!-- Script libraries first -->
+  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Then load your modular JS in correct order -->
+  <script src="js/firebase-init.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/milestones.js"></script>
+  <script src="js/journal.js"></script>
+  <script src="js/questions.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
