@@ -54,7 +54,7 @@ window.API = {
     }
 
     try {
-      return await fetchWithAuth("http://localhost:3000/save-goal", "POST", { goal: text });
+      return await fetchWithAuth("http://localhost:3001/save-goal", "POST", { goal: text });
     } catch (err) {
       console.error("Error saving goal:", err);
       return { status: "error", error: err.message };
@@ -63,7 +63,7 @@ window.API = {
 
   getGoals: async () => {
     try {
-      return await fetchWithAuth("http://localhost:3000/get-goals");
+      return await fetchWithAuth("http://localhost:3001/get-goals");
     } catch (err) {
       console.error("Error getting goals:", err);
       return { status: "error", error: err.message, goals: [] };
@@ -71,29 +71,29 @@ window.API = {
   },
 
   deleteGoal: (goalId) =>
-    fetchWithAuth(`http://localhost:3000/delete-goal/${goalId}`, "DELETE"),
+    fetchWithAuth(`http://localhost:3001/delete-goal/${goalId}`, "DELETE"),
 
   // Milestone management
   getMilestones: (goalId) =>
-    fetchWithAuth(`http://localhost:3000/milestones/${goalId}`),
+    fetchWithAuth(`http://localhost:3001/milestones/${goalId}`),
 
   addMilestone: (goalId, milestone) =>
-    fetchWithAuth("http://localhost:3000/add-milestone", "POST", { goalId, milestone }),
+    fetchWithAuth("http://localhost:3001/add-milestone", "POST", { goalId, milestone }),
 
   updateMilestone: (goalId, milestoneId, checked) =>
-    fetchWithAuth(`http://localhost:3000/milestone/${goalId}/${milestoneId}`, "PATCH", { checked }),
+    fetchWithAuth(`http://localhost:3001/milestone/${goalId}/${milestoneId}`, "PATCH", { checked }),
 
   deleteMilestone: (goalId, milestoneId) =>
-    fetchWithAuth(`http://localhost:3000/milestone/${goalId}/${milestoneId}`, "DELETE"),
+    fetchWithAuth(`http://localhost:3001/milestone/${goalId}/${milestoneId}`, "DELETE"),
 
   // Journal entries
   addEntry: (entry) =>
-    fetchWithAuth("http://localhost:3000/add-entry", "POST", entry),
+    fetchWithAuth("http://localhost:3001/add-entry", "POST", entry),
 
   getJournal: () =>
-    fetchWithAuth("http://localhost:3000/journal"),
+    fetchWithAuth("http://localhost:3001/journal"),
 
   // AI goal step suggestions
   getAISteps: (goalText) =>
-    postJSON("http://localhost:3000/generate-steps", { goal: goalText }),
+    postJSON("http://localhost:3001/generate-steps", { goal: goalText }),
 };
