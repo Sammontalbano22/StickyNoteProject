@@ -1,3 +1,7 @@
+## 🙌 Shout-Outs
+
+A huge thank-you to my project partner, **[Jake Holcombe](https://github.com/JakeHolcombe16)**, whose creativity has helped make this project a success!
+
 # About the Project
 
 The Sticky Note That Changed My Life!
@@ -20,8 +24,6 @@ After four years of steady, intentional effort—bit by bit, day by day—I rece
 Anyone who has ever set a New Year’s resolution only to give up weeks later knows the truth: long-term goals are hard. In a world of instant gratification, it's difficult to keep striving when the results aren’t immediate. Long-term success demands consistency, habits, and faith in the process.
 
 That’s why, for my senior design project—an independent study through the Computer Science department at the University of Denver—I’m developing an app inspired by this experience. The app will help users set and stay accountable to their long-term goals, using motivation techniques like habit tracking, reflective prompts, milestone celebrations, and even a virtual progress counselor. My hope is to make long-term goals feel achievable by breaking them down into small day by day goals.
-
-
 
 
 
