@@ -52,7 +52,7 @@ cd project-name
 git checkout -b feature/your-feature-name
 ```
 
-# 📥 4. Make your Changes within your Branch
+## 📥 4. Make your Changes within your Branch
 
 Your Changes should include proper formatting and commenting.
 
