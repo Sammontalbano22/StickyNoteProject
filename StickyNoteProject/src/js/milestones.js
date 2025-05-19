@@ -294,3 +294,5 @@ window.renderMilestone = renderMilestone;
 window.addMilestone = addMilestone;
 window.loadCardBack = loadCardBack;
 window.updateGoalProgress = updateGoalProgress;
+
+export { addGoal, loadGoals, addMilestone, renderMilestone, updateGoalProgress, displayAISteps, loadCardBack };

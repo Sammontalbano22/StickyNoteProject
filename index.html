@@ -10,58 +10,23 @@
   <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
 </head>
 <body>
-  <header>
-    <h1>🎯 My Long-Term Goal Board</h1>
-    <div id="progress-bar"><div id="progress-fill"></div></div>
-    <button id="btn-logout" style="display: none;">🚪 Sign Out</button>
-  </header>
+ 
 
-  <!-- Authentication UI -->
-  <div id="auth">
-    <input id="email" type="email" placeholder="Email" />
-    <input id="password" type="password" placeholder="Password" />
-    <button id="btn-signup">Sign Up</button>
-    <button id="btn-login">Log In</button>
-    <p id="auth-status"></p>
-  </div>
+ 
 
   <!-- App Content -->
   <div id="app-content" style="display:none;">
     <main>
-      <!-- Goal Creation -->
-      <section id="goal-creator">
-        <h2>Write a New Goal</h2>
-        <div class="note-pad">
-          <textarea id="goal-input" placeholder="Write your sticky goal here..."></textarea>
-        </div>
-        <button onclick="addGoal()">📌 Pin Goal</button>
-      </section>
-
-      <!-- Goal Display -->
-      <section id="goal-board">
-        <h2>Pinned Goals</h2>
-        <div id="sticky-board"></div>
-      </section>
-
-      <!-- AI Suggestions -->
-      <section id="suggestions">
-        <h2>AI Suggested Steps</h2>
-        <div id="suggested-goals"></div>
-      </section>
+      
 
       <!-- Daily Journal -->
       <section id="daily-journal">
-        <h2>Daily Progress Questions</h2>
-        <label for="goal-select">Which goal are you reflecting on?</label>
-        <select id="goal-select"><option value="">-- Select a goal --</option></select>
-        <p id="daily-question">What’s one thing you did today to move toward your goal?</p>
-        <textarea id="daily-answer" placeholder="Write your reflection..."></textarea>
-        <button onclick="submitAnswer()">Submit</button>
+        
       </section>
-
-      <button onclick="loadJournal()">📖 View Journal</button>
-      <div id="journal-section"></div>
-
+        
+        <button onclick="loadJournal()">📖 View Journal</button>
+        <div id="journal-section"></div>
+        
       <!-- Milestone Tracker -->
       <section id="milestones">
         <h2>Milestone Tracker</h2>
