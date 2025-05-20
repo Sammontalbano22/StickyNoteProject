@@ -33,6 +33,10 @@ Contributions are welcome! Follow these steps to get started:
 
 ---
 
+## ⭐ Star this REPO
+
+Starring this repo grately helps us.
+
 ## 🧾 1. Fork the Repository
 
 Click **"Fork"** in the top right corner of the GitHub repo.
