@@ -1,7 +1,10 @@
+
 // src/js/firebase-init.js
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAja-Rzo_5Iwu1iWya9XgioX16WeeBseUQ",
+  apiKey: "AIzaSyD3CeTzQhB5HNxJ563unF5rKh0OP-FervI",
   authDomain: "stickynotesapp-877be.firebaseapp.com",
   databaseURL: "https://stickynotesapp-877be-default-rtdb.firebaseio.com",
   projectId: "stickynotesapp-877be",
@@ -11,17 +14,13 @@ const firebaseConfig = {
   measurementId: "G-89BRL2WDNM"
 };
 
-firebase.initializeApp(firebaseConfig);
 
-// Make Firebase services available globally
-const auth = firebase.auth();
-const db = firebase.firestore();
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-window.auth = auth;
-window.db = db;
-window.lastGoalId = null;
+// ✅ Fallback to ensure global user is always accessible
+if (!window.currentUser && auth.currentUser) {
+  window.currentUser = auth.currentUser;
+}
 
-// Optional: track current user globally
-auth.onAuthStateChanged(user => {
-  window.currentUser = user || null;
-});
+export { auth };

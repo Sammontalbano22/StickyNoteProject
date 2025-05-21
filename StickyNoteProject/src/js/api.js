@@ -1,19 +1,16 @@
 // src/js/api.js
+import { auth } from './firebase-init.js';
 
-/**
- * Helper: Sends an authenticated request to your backend.
- * @param {string} url - The endpoint URL
- * @param {string} method - HTTP method (GET, POST, DELETE, etc.)
- * @param {object} body - Optional body payload
- * @returns {Promise<any>} - Parsed JSON response
- */
 async function fetchWithAuth(url, method = "GET", body = null) {
-  const user = auth.currentUser;
+  const user = auth.currentUser || window.currentUser;
   if (!user) {
-    throw new Error("Not authenticated");
+    console.warn("❌ fetchWithAuth: No current user");
+    alert("❌ Not signed in — cannot save goal.");
+    return { status: "error", error: "Not signed in" };
   }
 
   const token = await user.getIdToken();
+  console.log("🔐 Using ID token:", token);
 
   const options = {
     method,
@@ -30,9 +27,6 @@ async function fetchWithAuth(url, method = "GET", body = null) {
   return res.json();
 }
 
-/**
- * Helper: Sends a non-authenticated POST request to OpenAI endpoint.
- */
 async function postJSON(url, data) {
   const res = await fetch(url, {
     method: "POST",
@@ -43,11 +37,9 @@ async function postJSON(url, data) {
   return res.json();
 }
 
-// Export all backend-related functions
-window.API = {
-  // Goal management
+export const API = {
   saveGoal: async (text) => {
-    const user = auth.currentUser;
+    const user = auth.currentUser || window.currentUser;
     if (!user) {
       alert("❌ Not signed in — cannot save goal.");
       return { status: "error", error: "Not signed in" };
@@ -60,7 +52,6 @@ window.API = {
       return { status: "error", error: err.message };
     }
   },
-
   getGoals: async () => {
     try {
       return await fetchWithAuth("http://localhost:3001/get-goals");
@@ -69,31 +60,15 @@ window.API = {
       return { status: "error", error: err.message, goals: [] };
     }
   },
-
-  deleteGoal: (goalId) =>
-    fetchWithAuth(`http://localhost:3001/delete-goal/${goalId}`, "DELETE"),
-
-  // Milestone management
-  getMilestones: (goalId) =>
-    fetchWithAuth(`http://localhost:3001/milestones/${goalId}`),
-
+  deleteGoal: (goalId) => fetchWithAuth(`http://localhost:3001/delete-goal/${goalId}`, "DELETE"),
+  getMilestones: (goalId) => fetchWithAuth(`http://localhost:3001/milestones/${goalId}`),
   addMilestone: (goalId, milestone) =>
     fetchWithAuth("http://localhost:3001/add-milestone", "POST", { goalId, milestone }),
-
   updateMilestone: (goalId, milestoneId, checked) =>
     fetchWithAuth(`http://localhost:3001/milestone/${goalId}/${milestoneId}`, "PATCH", { checked }),
-
   deleteMilestone: (goalId, milestoneId) =>
     fetchWithAuth(`http://localhost:3001/milestone/${goalId}/${milestoneId}`, "DELETE"),
-
-  // Journal entries
-  addEntry: (entry) =>
-    fetchWithAuth("http://localhost:3001/add-entry", "POST", entry),
-
-  getJournal: () =>
-    fetchWithAuth("http://localhost:3001/journal"),
-
-  // AI goal step suggestions
-  getAISteps: (goalText) =>
-    postJSON("http://localhost:3001/generate-steps", { goal: goalText }),
+  addEntry: (entry) => fetchWithAuth("http://localhost:3001/add-entry", "POST", entry),
+  getJournal: () => fetchWithAuth("http://localhost:3001/journal"),
+  getAISteps: (goalText) => postJSON("http://localhost:3001/generate-steps", { goal: goalText }),
 };
