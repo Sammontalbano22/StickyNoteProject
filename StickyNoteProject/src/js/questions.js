@@ -39,3 +39,5 @@ function submitAnswer() {
   document.getElementById("daily-answer").value = "";
   updateProgress();
 }
+
+export { getRandomQuestion, submitAnswer };

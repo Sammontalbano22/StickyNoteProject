@@ -1,5 +1,8 @@
 // src/js/milestones.js
 
+import { auth } from './firebase-init.js';
+import { API } from './api.js';
+
 // Add a new goal
 async function addGoal() {
   const input = document.getElementById("goal-input");
@@ -54,8 +57,6 @@ async function loadGoals() {
   }
 }
 
-
-// Render a sticky note card (goal) with flip
 function renderGoalCard(goal, container) {
   const flipContainer = document.createElement("div");
   flipContainer.className = "flip-container";
@@ -117,7 +118,6 @@ function addDropdownOption(goal, dropdown) {
   dropdown.appendChild(option);
 }
 
-// Render a single milestone list item
 function renderMilestone(text, goalId, isChecked, milestoneId = null) {
   const li = document.createElement("li");
   const checkbox = document.createElement("input");
@@ -155,7 +155,6 @@ function renderMilestone(text, goalId, isChecked, milestoneId = null) {
   document.getElementById("milestone-list").appendChild(li);
 }
 
-// Add a new milestone manually
 function addMilestone() {
   const input = document.getElementById("milestone-input");
   const text = input.value.trim();
@@ -174,7 +173,6 @@ function addMilestone() {
   });
 }
 
-// Accept a step from AI suggestions
 function acceptStep(stepText, button) {
   const goalId = document.getElementById('milestone-goal-select').value;
   if (!goalId) return alert("⚠️ Please select a goal to attach this milestone.");
@@ -194,12 +192,10 @@ function acceptStep(stepText, button) {
   });
 }
 
-// Reject an AI suggestion
 function rejectStep(button) {
   button.parentElement.remove();
 }
 
-// Display AI steps
 function displayAISteps(steps, goalText) {
   const suggestionsDiv = document.getElementById("suggested-goals");
   suggestionsDiv.innerHTML = "";
@@ -219,7 +215,6 @@ function displayAISteps(steps, goalText) {
   });
 }
 
-// Update the goal's progress bar
 function updateGoalProgress(goalId) {
   const milestones = [...document.querySelectorAll(`#milestone-list li[data-goal-id="${goalId}"]`)];
   const total = milestones.length;
@@ -238,7 +233,6 @@ function updateGoalProgress(goalId) {
   });
 }
 
-// Load goal back side
 async function loadCardBack(container, goalId) {
   container.innerHTML = "";
   const inner = document.createElement("div");
@@ -285,7 +279,7 @@ async function loadCardBack(container, goalId) {
   container.appendChild(inner);
 }
 
-// Expose globally for HTML use
+// Expose globally
 window.addGoal = addGoal;
 window.loadGoals = loadGoals;
 window.acceptStep = acceptStep;
@@ -295,4 +289,12 @@ window.addMilestone = addMilestone;
 window.loadCardBack = loadCardBack;
 window.updateGoalProgress = updateGoalProgress;
 
-export { addGoal, loadGoals, addMilestone, renderMilestone, updateGoalProgress, displayAISteps, loadCardBack };
+export {
+  addGoal,
+  loadGoals,
+  addMilestone,
+  renderMilestone,
+  updateGoalProgress,
+  displayAISteps,
+  loadCardBack
+};

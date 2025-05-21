@@ -1,69 +1,81 @@
 // src/js/auth.js
+import { auth } from './firebase-init.js';
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
+} from 'firebase/auth';
 
-const btnSignup = document.getElementById('btn-signup');
-const btnLogin = document.getElementById('btn-login');
-const btnLogout = document.getElementById('btn-logout');
-const authStatus = document.getElementById('auth-status');
+import { loadGoals } from './milestones.js';
 
-// Sign up a new user
-async function signupUser() {
-  const emailInput = document.getElementById('email');
-  const passwordInput = document.getElementById('password');
+console.log("✅ auth.js loaded");
 
-  if (passwordInput.value.length < 6) {
-    authStatus.textContent = '❌ Password must be at least 6 characters';
+setTimeout(() => {
+  console.log("⏳ Waiting for DOM to be ready...");
+
+  const btnSignup = document.getElementById('btn-signup');
+  const btnLogin = document.getElementById('btn-login');
+  const btnLogout = document.getElementById('btn-logout');
+  const authStatus = document.getElementById('auth-status');
+
+  if (!btnLogin || !btnSignup) {
+    console.warn("❌ Login or Signup buttons not found in DOM");
     return;
   }
 
-  try {
-    await auth.createUserWithEmailAndPassword(emailInput.value, passwordInput.value);
-    authStatus.textContent = '';
-    emailInput.value = '';
-    passwordInput.value = '';
-  } catch (e) {
-    authStatus.textContent = `❌ ${e.message}`;
-  }
-}
+  btnSignup.addEventListener('click', async () => {
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    if (passwordInput.value.length < 6) {
+      authStatus.textContent = '❌ Password must be at least 6 characters';
+      return;
+    }
 
-// Log in an existing user
-async function loginUser() {
-  const emailInput = document.getElementById('email');
-  const passwordInput = document.getElementById('password');
-  try {
-    await auth.signInWithEmailAndPassword(emailInput.value, passwordInput.value);
-    authStatus.textContent = '';
-    emailInput.value = '';
-    passwordInput.value = '';
-  } catch (e) {
-    authStatus.textContent = `❌ ${e.message}`;
-  }
-}
+    try {
+      await createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+      authStatus.textContent = '✅ Signed up';
+      emailInput.value = '';
+      passwordInput.value = '';
+    } catch (e) {
+      authStatus.textContent = `❌ ${e.message}`;
+    }
+  });
 
-// Log out the current user
-function logoutUser() {
-  auth.signOut();
-}
+  btnLogin.addEventListener('click', async () => {
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
 
-// Attach event listeners safely
-if (btnSignup) btnSignup.addEventListener('click', signupUser);
-if (btnLogin) btnLogin.addEventListener('click', loginUser);
-if (btnLogout) btnLogout.addEventListener('click', logoutUser);
+    try {
+      await signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+      authStatus.textContent = '✅ Logged in';
+      emailInput.value = '';
+      passwordInput.value = '';
+    } catch (e) {
+      authStatus.textContent = `❌ ${e.message}`;
+    }
+  });
 
-// Auth state change handler
-auth.onAuthStateChanged(user => {
-  const isLoggedIn = !!user;
-  document.getElementById("auth").style.display = isLoggedIn ? "none" : "block";
-  document.getElementById("app-content").style.display = isLoggedIn ? "block" : "none";
-  btnLogout.style.display = isLoggedIn ? "inline-block" : "none";
+  btnLogout?.addEventListener('click', () => {
+    signOut(auth).catch((e) => {
+      console.error("❌ Logout error:", e.message);
+    });
+  });
 
-  window.currentUser = user || null;
+  onAuthStateChanged(auth, (user) => {
+    const isLoggedIn = !!user;
 
-  if (isLoggedIn && typeof loadGoals === "function") {
-    loadGoals();
-  }
-});
+    document.getElementById("auth").style.display = isLoggedIn ? "none" : "block";
+    document.getElementById("app-content").style.display = isLoggedIn ? "block" : "none";
+    if (btnLogout) btnLogout.style.display = isLoggedIn ? "inline-block" : "none";
 
-// Expose functions globally
-window.signupUser = signupUser;
-window.loginUser = loginUser;
-window.logoutUser = logoutUser;
+    window.currentUser = user || null;
+
+    if (isLoggedIn) {
+      console.log("✅ Auth state confirmed. Waiting for currentUser token...");
+      setTimeout(() => {
+        loadGoals();
+      }, 100);
+    }
+  });
+}, 0);
