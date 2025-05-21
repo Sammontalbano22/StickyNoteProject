@@ -20,7 +20,7 @@ setTimeout(() => {
   const authStatus = document.getElementById('auth-status');
 
   if (!btnLogin || !btnSignup) {
-    console.warn("❌ Login or Signup buttons not found in DOM");
+    console.warn("❌ Login or Signup buttons not found in DOM")
     return;
   }
 
