@@ -40,3 +40,28 @@
 .read-the-docs {
   color: #888;
 }
+
+header {
+  margin-bottom: 2.5em;
+  text-align: center;
+}
+
+header h1 {
+  font-family: 'Patrick Hand', cursive;
+  font-size: 2.6em;
+  color: #f4a261;
+  margin-bottom: 0.2em;
+  letter-spacing: 1px;
+  text-shadow: 1px 2px 0 #fffbe8, 2px 4px 8px #f4a26144;
+}
+
+header h2 {
+  font-family: 'Patrick Hand', cursive;
+  font-weight: 400;
+  font-size: 1.5em;
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 0.7em;
+  letter-spacing: 0.5px;
+  text-shadow: 1px 1px 0 #ffe082;
+}
