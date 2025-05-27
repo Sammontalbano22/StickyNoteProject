@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
 import '/public/css/main.css';
 
@@ -17,6 +17,8 @@ import {
 } from './js/milestones.js';
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   useEffect(() => {
     // Dynamically load auth.js AFTER the DOM is rendered by React
     const script = document.createElement('script');
@@ -24,17 +26,42 @@ function App() {
     script.type = 'module';
     document.body.appendChild(script);
 
+    // Listen for auth state changes
+    const checkAuth = setInterval(() => {
+      const user = window.currentUser;
+      setIsLoggedIn(!!user);
+    }, 300);
+
     return () => {
       document.body.removeChild(script);
+      clearInterval(checkAuth);
     };
   }, []);
 
   return (
     <div className="App">
-      <Header />
+      {isLoggedIn && <Header />}
       <Auth />
 
-      <div id="app-content" style={{ display: 'none' }}>
+      {/* Sign Out button for main page */}
+      {isLoggedIn && (
+        <button
+          id="btn-logout"
+          style={{ margin: '1em', display: 'inline-block' }}
+          onClick={() => {
+            // Use Firebase signOut directly
+            import('./js/firebase-init.js').then(({ auth }) => {
+              import('firebase/auth').then(({ signOut }) => {
+                signOut(auth);
+              });
+            });
+          }}
+        >
+          🚪 Sign Out
+        </button>
+      )}
+
+      <div id="app-content" style={{ display: isLoggedIn ? 'block' : 'none' }}>
         <main>
           {/* Goal Creation */}
           <section id="goal-creator">
