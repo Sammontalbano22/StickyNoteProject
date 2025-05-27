@@ -4,6 +4,24 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'fire
 
 const APP_DESCRIPTION = `The Sticky Note That Changed My Life! Growing up, I always knew I wanted to go to college. I was captivated by the idea of learning from world-class resources and being part of a community that was dedicated to growth. But I also knew the path wouldn’t be easy—college is expensive, and navigating the road to higher education takes more than just ambition.\n\nAt the start of my freshman year of high school, I made two long-term goals:\n\nTo have options when choosing a university\n\nTo attend college on a full-ride scholarship\n\nThese were bold dreams. Less than 1% of students earn a full-ride scholarship, and I was well aware of the odds. But that awareness didn’t discourage me—it pushed me. For the first time in my life, I wrote a goal down. On a small 3x3 sticky note, I wrote: “I will be a Daniels Fund Scholar.” The Daniels Fund is a prestigious full-ride scholarship program in the Southwestern United States, and I stuck that note right next to my bed.\n\nThat sticky note became my compass. On days when I felt motivated, I’d look at it and feel a surge of purpose. And on days when I felt like doing nothing at all, I’d still see it. It reminded me that taking even one small step toward my goal was still progress. It taught me that showing up, consistently, is its own kind of victory.\n\nMy junior year of high school tested that belief. I suffered a traumatic injury that forced me to miss a significant amount of school. When I returned, I felt like a shadow of my former self. But the sticky note was still there. It reminded me why I needed to keep going. Even if all I could do was show up to class, that was still a step.\n\nAfter four years of steady, intentional effort—bit by bit, day by day—I received the life-changing news: I had been selected as a Daniels Fund Scholar. I had earned a full-ride scholarship to study at a university of my choice. That moment will remain one of the most vivid memories of my life. I walked over to the sticky note and, with pride and overwhelming gratitude, crossed it off. That little square of paper became a symbol of resilience, discipline, and unwavering self-belief.\n\nAnyone who has ever set a New Year’s resolution only to give up weeks later knows the truth: long-term goals are hard. In a world of instant gratification, it's difficult to keep striving when the results aren’t immediate. Long-term success demands consistency, habits, and faith in the process.\n\nThat’s why, for my senior design project—an independent study through the Computer Science department at the University of Denver—I’m developing an app inspired by this experience. The app will help users set and stay accountable to their long-term goals, using motivation techniques like habit tracking, reflective prompts, milestone celebrations, and even a virtual progress counselor. My hope is to make long-term goals feel achievable by breaking them down into small day by day goals.`;
 
+const tipsAndQuotes = [
+  "A goal without a plan is just a wish. – Antoine de Saint-Exupéry",
+  "Long-term goals keep you moving forward, even when progress feels slow.",
+  "Success is the sum of small efforts, repeated day in and day out. – Robert Collier",
+  "Dream big, start small, act now.",
+  "The secret to getting ahead is getting started. – Mark Twain",
+  "Discipline is the bridge between goals and accomplishment. – Jim Rohn",
+  "You don’t have to be great to start, but you have to start to be great. – Zig Ziglar",
+  "Stay patient and trust your journey.",
+  "Every accomplishment starts with the decision to try.",
+  "Set a goal so big you can’t achieve it until you grow into the person who can.",
+  "The future depends on what you do today. – Mahatma Gandhi",
+  "It always seems impossible until it’s done. – Nelson Mandela",
+  "Small steps every day add up to big results.",
+  "Your goals are the road maps that guide you and show you what is possible for your life. – Les Brown",
+  "Don’t watch the clock; do what it does. Keep going. – Sam Levenson"
+];
+
 const Auth = ({ onLoginSuccess }) => {
   const [showDescription, setShowDescription] = useState(false);
   const [email, setEmail] = useState('');
@@ -13,6 +31,7 @@ const Auth = ({ onLoginSuccess }) => {
   const spiderTimeout = useRef(null);
   const signupBtnRef = useRef(null);
   const [spiderSwing, setSpiderSwing] = useState({ left: 0, top: 0 });
+  const [randomTip, setRandomTip] = useState('');
 
   // Easter egg: show spider if 'spider' is typed in email
   useEffect(() => {
@@ -133,8 +152,26 @@ const Auth = ({ onLoginSuccess }) => {
     return () => raf && cancelAnimationFrame(raf);
   }, [showSpider, spiderPhase]);
 
+  // Set a random tip/quote on mount
+  useEffect(() => {
+    setRandomTip(tipsAndQuotes[Math.floor(Math.random() * tipsAndQuotes.length)]);
+  }, []);
+
   return (
     <>
+      {/* Sharp, square sticky note background decorations - larger and more spread out */}
+      <div className="sticky-bg-note sticky-bg-yellow" style={{ width: 140, height: 140, left: 24, top: 32, transform: 'rotate(-7deg)' }} />
+      <div className="sticky-bg-note sticky-bg-pink" style={{ width: 120, height: 120, right: 40, top: 60, transform: 'rotate(10deg)' }} />
+      <div className="sticky-bg-note sticky-bg-blue" style={{ width: 130, height: 130, left: 80, bottom: 80, transform: 'rotate(-13deg)' }} />
+      <div className="sticky-bg-note sticky-bg-green" style={{ width: 110, height: 110, right: 120, bottom: 160, transform: 'rotate(6deg)' }} />
+      <div className="sticky-bg-note sticky-bg-purple" style={{ width: 125, height: 125, left: '55%', top: 40, transform: 'translateX(-50%) rotate(4deg)' }} />
+      <div className="sticky-bg-note sticky-bg-yellow" style={{ width: 110, height: 110, left: 300, top: 320, transform: 'rotate(-3deg)' }} />
+      <div className="sticky-bg-note sticky-bg-pink" style={{ width: 100, height: 100, right: 260, top: 420, transform: 'rotate(8deg)' }} />
+      <div className="sticky-bg-note sticky-bg-blue" style={{ width: 120, height: 120, left: 60, bottom: 260, transform: 'rotate(-10deg)' }} />
+      <div className="sticky-bg-note sticky-bg-green" style={{ width: 100, height: 100, right: 60, bottom: 60, transform: 'rotate(2deg)' }} />
+      <div className="sticky-bg-note sticky-bg-purple" style={{ width: 120, height: 120, left: '70%', top: 220, transform: 'translateX(-50%) rotate(-5deg)' }} />
+      <div className="sticky-bg-note sticky-bg-yellow" style={{ width: 130, height: 130, left: 0, bottom: 0, transform: 'rotate(-8deg)' }} />
+      <div className="sticky-bg-note sticky-bg-pink" style={{ width: 110, height: 110, right: 0, bottom: 0, transform: 'rotate(12deg)' }} />
       <h1
         className="sticky-title sticky-title-large sticky-title-interactive"
         tabIndex={0}
@@ -171,7 +208,59 @@ const Auth = ({ onLoginSuccess }) => {
         >
           {showDescription ? '▲' : '▼'}
         </span>
+        {/* Add gentle bounce animation style */}
+        <style>{`
+          @keyframes gentle-bounce {
+            0% { transform: scale(1) rotate(0deg); }
+            10% { transform: scale(1.04,0.97) rotate(-2deg); }
+            18% { transform: scale(0.98,1.03) rotate(2deg); }
+            26% { transform: scale(1.03,0.98) rotate(-1.5deg); }
+            34% { transform: scale(1,1) rotate(0deg); }
+            100% { transform: scale(1) rotate(0deg); }
+          }
+        `}</style>
       </h1>
+      {/* Attractive, non-intrusive UI prompt to click the title */}
+      {!showDescription && (
+        <div style={{
+          display: 'flex', justifyContent: 'center', alignItems: 'center',
+          margin: '0.2em 0 0.7em 0',
+        }}>
+          <div style={{
+            background: 'rgba(255, 224, 130, 0.78)',
+            color: '#4d2600',
+            border: '1px dashed #f4a261',
+            borderRadius: '12px 16px 14px 18px/18px 14px 16px 12px',
+            boxShadow: '0 1px 6px #f4a26118',
+            fontFamily: 'Patrick Hand, Comic Sans MS, cursive, sans-serif',
+            fontSize: '1em',
+            padding: '0.45em 1em',
+            display: 'flex', alignItems: 'center', gap: 8,
+            animation: 'fade-in-pulse 1.2s',
+            cursor: 'pointer',
+            userSelect: 'none',
+            maxWidth: 340,
+            opacity: 0.85,
+            transition: 'background 0.2s, opacity 0.2s',
+          }}
+            tabIndex={0}
+            onClick={() => setShowDescription(true)}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setShowDescription(true); }}
+            aria-label="Click to learn more about this app"
+          >
+            <span style={{ fontSize: '1.1em', marginRight: 4 }}>💡</span>
+            <span style={{ fontWeight: 500 }}>Tip: <b>Click the Sticky Note Project title</b> to learn the story!</span>
+            <span style={{ fontSize: '1em', marginLeft: 4, opacity: 0.6 }}>👆</span>
+          </div>
+          <style>{`
+            @keyframes fade-in-pulse {
+              0% { opacity: 0; transform: scale(0.95); }
+              60% { opacity: 1; transform: scale(1.04); }
+              100% { opacity: 0.85; transform: scale(1); }
+            }
+          `}</style>
+        </div>
+      )}
       {/* Spider and web attached to Sign Up button only */}
       {showSpider && (
         <div style={{
@@ -476,6 +565,26 @@ const Auth = ({ onLoginSuccess }) => {
           </button>
         </div>
         <p id="auth-status" style={{ minHeight: 24, margin: 0, color: '#b22222', fontWeight: 500, fontSize: '1em' }}>{statusMsg}</p>
+      </div>
+      {/* Tips/Quotes Box */}
+      <div style={{
+        margin: '1.5em auto 0',
+        maxWidth: 400,
+        background: '#fffbe8',
+        borderRadius: 12,
+        boxShadow: '0 2px 8px #f7e9b6',
+        padding: '1em 1.2em',
+        fontFamily: 'Patrick Hand, Comic Sans MS, cursive',
+        fontSize: '1.1em',
+        color: '#b8860b',
+        textAlign: 'center',
+        position: 'relative',
+        minHeight: 60,
+        letterSpacing: 0.2,
+        animation: 'fadeIn 1.2s',
+      }}>
+        <span style={{fontSize: '1.3em', marginRight: 8}}>💡</span>
+        <span>{randomTip}</span>
       </div>
     </>
   );

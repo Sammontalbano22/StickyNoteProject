@@ -28,6 +28,9 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background-color: #fffbe8;
+  position: relative;
+  overflow-x: hidden;
 }
 
 h1 {
@@ -52,6 +55,52 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+
+/* Sticky note background decorations (sharp, square) */
+.sticky-bg-note {
+  position: fixed;
+  z-index: 0;
+  opacity: 0.22;
+  box-shadow: 0 8px 24px #f4a26144, 0 2px 0 #fffbe8 inset, 0 0.5px 0 #bdbdbd inset;
+  border-radius: 0.25em 0.18em 0.32em 0.12em;
+  pointer-events: none;
+  border: 1.5px solid #e0c97f;
+  transition: filter 0.2s;
+  /* Add a little curl/fold effect */
+  background-image: linear-gradient(120deg, rgba(255,255,255,0.13) 0%, rgba(255,255,255,0.01) 80%),
+    linear-gradient(0deg, rgba(255,255,255,0.09) 0%, rgba(0,0,0,0.04) 100%);
+}
+.sticky-bg-yellow { background: #ffe082; border-color: #f4a261; }
+.sticky-bg-pink { background: #ffd1dc; border-color: #e57373; }
+.sticky-bg-blue { background: #b3e5fc; border-color: #4fc3f7; }
+.sticky-bg-green { background: #dcedc8; border-color: #81c784; }
+.sticky-bg-purple { background: #e1bee7; border-color: #ba68c8; }
+
+.sticky-bg-note::after {
+  content: '';
+  display: block;
+  position: absolute;
+  right: 0.5em;
+  bottom: 0.5em;
+  width: 22%;
+  height: 22%;
+  background: linear-gradient(135deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.01) 100%);
+  border-radius: 0 0 0.18em 0.18em;
+  pointer-events: none;
+}
+
+.sticky-bg-note::before {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0.5em;
+  top: 0.5em;
+  width: 18%;
+  height: 18%;
+  background: linear-gradient(45deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.01) 100%);
+  border-radius: 0.18em 0.18em 0 0;
+  pointer-events: none;
 }
 
 @media (prefers-color-scheme: light) {
