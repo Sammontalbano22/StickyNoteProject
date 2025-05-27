@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { auth } from '../js/firebase-init.js';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 
 const APP_DESCRIPTION = `The Sticky Note That Changed My Life! Growing up, I always knew I wanted to go to college. I was captivated by the idea of learning from world-class resources and being part of a community that was dedicated to growth. But I also knew the path wouldn’t be easy—college is expensive, and navigating the road to higher education takes more than just ambition.\n\nAt the start of my freshman year of high school, I made two long-term goals:\n\nTo have options when choosing a university\n\nTo attend college on a full-ride scholarship\n\nThese were bold dreams. Less than 1% of students earn a full-ride scholarship, and I was well aware of the odds. But that awareness didn’t discourage me—it pushed me. For the first time in my life, I wrote a goal down. On a small 3x3 sticky note, I wrote: “I will be a Daniels Fund Scholar.” The Daniels Fund is a prestigious full-ride scholarship program in the Southwestern United States, and I stuck that note right next to my bed.\n\nThat sticky note became my compass. On days when I felt motivated, I’d look at it and feel a surge of purpose. And on days when I felt like doing nothing at all, I’d still see it. It reminded me that taking even one small step toward my goal was still progress. It taught me that showing up, consistently, is its own kind of victory.\n\nMy junior year of high school tested that belief. I suffered a traumatic injury that forced me to miss a significant amount of school. When I returned, I felt like a shadow of my former self. But the sticky note was still there. It reminded me why I needed to keep going. Even if all I could do was show up to class, that was still a step.\n\nAfter four years of steady, intentional effort—bit by bit, day by day—I received the life-changing news: I had been selected as a Daniels Fund Scholar. I had earned a full-ride scholarship to study at a university of my choice. That moment will remain one of the most vivid memories of my life. I walked over to the sticky note and, with pride and overwhelming gratitude, crossed it off. That little square of paper became a symbol of resilience, discipline, and unwavering self-belief.\n\nAnyone who has ever set a New Year’s resolution only to give up weeks later knows the truth: long-term goals are hard. In a world of instant gratification, it's difficult to keep striving when the results aren’t immediate. Long-term success demands consistency, habits, and faith in the process.\n\nThat’s why, for my senior design project—an independent study through the Computer Science department at the University of Denver—I’m developing an app inspired by this experience. The app will help users set and stay accountable to their long-term goals, using motivation techniques like habit tracking, reflective prompts, milestone celebrations, and even a virtual progress counselor. My hope is to make long-term goals feel achievable by breaking them down into small day by day goals.`;
 
@@ -22,6 +22,20 @@ const tipsAndQuotes = [
   "Don’t watch the clock; do what it does. Keep going. – Sam Levenson"
 ];
 
+// Useful tips and quotes for long-term goal setting
+const GOAL_TIPS = [
+  "Set goals that excite you and scare you at the same time.",
+  "A goal without a plan is just a wish.",
+  "Long-term goals require short-term wins. Celebrate progress!",
+  "Break big dreams into small, actionable steps.",
+  "Consistency beats intensity for long-term success.",
+  "Visualize your future self achieving your goal.",
+  "Review your goals regularly and adjust as needed.",
+  "Stay patient. Big things take time.",
+  "Your goals are the road maps that guide you and show you what is possible for your life. – Les Brown",
+  "Don’t watch the clock; do what it does. Keep going. – Sam Levenson"
+];
+
 const Auth = ({ onLoginSuccess }) => {
   const [showDescription, setShowDescription] = useState(false);
   const [email, setEmail] = useState('');
@@ -32,6 +46,7 @@ const Auth = ({ onLoginSuccess }) => {
   const signupBtnRef = useRef(null);
   const [spiderSwing, setSpiderSwing] = useState({ left: 0, top: 0 });
   const [randomTip, setRandomTip] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   // Easter egg: show spider if 'spider' is typed in email
   useEffect(() => {
@@ -154,7 +169,7 @@ const Auth = ({ onLoginSuccess }) => {
 
   // Set a random tip/quote on mount
   useEffect(() => {
-    setRandomTip(tipsAndQuotes[Math.floor(Math.random() * tipsAndQuotes.length)]);
+    setRandomTip(GOAL_TIPS[Math.floor(Math.random() * GOAL_TIPS.length)]);
   }, []);
 
   return (
@@ -179,6 +194,12 @@ const Auth = ({ onLoginSuccess }) => {
           cursor: 'pointer',
           outline: showDescription ? '2.5px solid #f4a261' : 'none',
           transition: 'outline 0.2s cubic-bezier(.4,2,.6,.9), filter 0.35s cubic-bezier(.4,2,.6,.9), transform 0.35s cubic-bezier(.4,2,.6,.9)',
+          background: '#fff', // Make the whole button white
+          color: '#4d2600',
+          borderRadius: 12,
+          boxShadow: showDescription ? '0 2px 8px #f4a26144' : '0 1px 4px #f4a26122',
+          padding: '0.25em 1.2em',
+          display: 'inline-block',
         }}
         onClick={() => setShowDescription((v) => !v)}
         onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setShowDescription(v => !v); }}
@@ -227,7 +248,7 @@ const Auth = ({ onLoginSuccess }) => {
           margin: '0.2em 0 0.7em 0',
         }}>
           <div style={{
-            background: 'rgba(255, 224, 130, 0.78)',
+            background: 'rgba(255, 224, 130, 0.78)', // reverted from solid white back to semi-transparent yellow
             color: '#4d2600',
             border: '1px dashed #f4a261',
             borderRadius: '12px 16px 14px 18px/18px 14px 16px 12px',
@@ -240,7 +261,7 @@ const Auth = ({ onLoginSuccess }) => {
             cursor: 'pointer',
             userSelect: 'none',
             maxWidth: 340,
-            opacity: 0.85,
+            opacity: 0.92,
             transition: 'background 0.2s, opacity 0.2s',
           }}
             tabIndex={0}
@@ -362,35 +383,117 @@ const Auth = ({ onLoginSuccess }) => {
         flexDirection: 'column',
         alignItems: 'center',
         gap: '0.7em',
-      }}>
-        <input id="email" type="email" placeholder="Email" autoComplete="username" style={{
-          fontSize: '1.1em',
-          padding: '0.7em 1em',
-          borderRadius: 8,
-          border: '1.5px solid #bdbdbd',
-          background: '#fff',
-          boxShadow: '0 1px 4px #f4a26122',
-          width: '100%',
-          transition: 'border 0.2s, box-shadow 0.2s',
-          color: '#4d2600',
-        }}
-        value={email}
-        onChange={e => setEmail(e.target.value)}
+      }}
+      role="form"
+      aria-labelledby="login-form-title"
+      >
+        <input
+          id="email"
+          type="email"
+          placeholder="Email"
+          autoComplete="username"
+          aria-label="Email address"
+          aria-required="true"
+          style={{
+            fontSize: '1.1em',
+            padding: '0.7em 1em',
+            borderRadius: 8,
+            border: '1.5px solid #bdbdbd',
+            background: '#fff',
+            boxShadow: '0 1px 4px #f4a26122',
+            width: '100%',
+            transition: 'border 0.2s, box-shadow 0.2s',
+            color: '#4d2600',
+            boxSizing: 'border-box',
+          }}
+          value={email}
+          onChange={e => setEmail(e.target.value)}
         />
-        <input id="password" type="password" placeholder="Password" autoComplete="current-password" style={{
-          fontSize: '1.1em',
-          padding: '0.7em 1em',
-          borderRadius: 8,
-          border: '1.5px solid #bdbdbd',
-          background: '#fff',
-          boxShadow: '0 1px 4px #f4a26122',
-          width: '100%',
-          transition: 'border 0.2s, box-shadow 0.2s',
-          color: '#4d2600', // brown font
-        }}
-        value={password}
-        onChange={e => setPassword(e.target.value)}
-        />
+        <div style={{ position: 'relative', width: '100%', boxSizing: 'border-box', height: 48 }}>
+          <input
+            id="password"
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            autoComplete="current-password"
+            aria-label="Password"
+            aria-required="true"
+            style={{
+              fontSize: '1.1em',
+              padding: '0.7em 1em',
+              borderRadius: 8,
+              border: '1.5px solid #bdbdbd',
+              background: '#fff',
+              boxShadow: '0 1px 4px #f4a26122',
+              width: '100%',
+              transition: 'border 0.2s, box-shadow 0.2s',
+              color: '#4d2600',
+              boxSizing: 'border-box',
+              height: 48,
+            }}
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+          />
+          <button
+            type="button"
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+            tabIndex={0}
+            onClick={() => setShowPassword(v => !v)}
+            style={{
+              position: 'absolute',
+              right: 12,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '1.1em',
+              color: '#b8860b',
+              padding: 0,
+              zIndex: 2,
+              height: 32,
+              width: 32,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            {showPassword ? '🙈' : '👁️'}
+          </button>
+        </div>
+        <div style={{ width: '100%', textAlign: 'right', marginTop: '-0.3em', marginBottom: '0.2em' }}>
+          <button
+            type="button"
+            aria-label="Forgot password? Send password reset email"
+            tabIndex={0}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#b8860b',
+              fontFamily: 'Patrick Hand, Comic Sans MS, cursive, sans-serif',
+              fontSize: '0.98em',
+              cursor: 'pointer',
+              textDecoration: 'underline',
+              padding: 0,
+              margin: 0,
+              outline: 'none',
+              transition: 'color 0.18s',
+            }}
+            onClick={async () => {
+              if (!email) {
+                setStatusMsg('Enter your email above to reset password.');
+                return;
+              }
+              try {
+                await sendPasswordResetEmail(auth, email);
+                setStatusMsg('📧 Password reset email sent!');
+              } catch (err) {
+                setStatusMsg('❌ ' + (err.message || 'Could not send reset email'));
+              }
+            }}
+          >
+            Forgot password?
+          </button>
+        </div>
         {/* Button row wrapper for perfect centering */}
         <div style={{
           width: '100%',
@@ -472,6 +575,9 @@ const Auth = ({ onLoginSuccess }) => {
           <button
             id="btn-signup"
             ref={signupBtnRef}
+            type="button"
+            aria-label="Sign up for a new account"
+            tabIndex={0}
             style={{
               background: '#ffe082',
               color: '#4d2600',
@@ -520,6 +626,9 @@ const Auth = ({ onLoginSuccess }) => {
           </button>
           <button
             id="btn-login"
+            type="submit"
+            aria-label="Log in to your account"
+            tabIndex={0}
             style={{
               background: '#ffe082',
               color: '#4d2600',
@@ -551,50 +660,49 @@ const Auth = ({ onLoginSuccess }) => {
                 return;
               }
               try {
+                const { setPersistence, browserLocalPersistence, browserSessionPersistence } = await import('firebase/auth');
+                await setPersistence(auth, browserSessionPersistence);
                 await signInWithEmailAndPassword(auth, email, password);
                 setStatusMsg('✅ Logged in');
                 setEmail('');
                 setPassword('');
                 if (onLoginSuccess) onLoginSuccess();
               } catch (err) {
-                setStatusMsg('❌ ' + (err.message || 'Login failed'));
+                setStatusMsg('❌ ' + (err.message || 'Log in failed'));
               }
             }}
           >
             Log In
           </button>
         </div>
-        <p id="auth-status" style={{ minHeight: 24, margin: 0, color: '#b22222', fontWeight: 500, fontSize: '1em' }}>{statusMsg}</p>
       </div>
-      {/* Tips/Quotes Box */}
-      <div style={{
-        margin: '1.5em auto 0',
-        maxWidth: 400,
-        background: '#fffbe8',
-        borderRadius: 12,
-        boxShadow: '0 2px 8px #f7e9b6',
-        padding: '1em 1.2em',
-        fontFamily: 'Patrick Hand, Comic Sans MS, cursive',
-        fontSize: '1.1em',
-        color: '#b8860b',
-        textAlign: 'center',
-        position: 'relative',
-        minHeight: 60,
-        letterSpacing: 0.2,
-        animation: 'fadeIn 1.2s',
-      }}>
-        <span style={{fontSize: '1.3em', marginRight: 8}}>💡</span>
-        <span>{randomTip}</span>
+      {/* Tips/Quotes box below login */}
+      <div
+        style={{
+          margin: '1.2em auto 0 auto',
+          maxWidth: 340,
+          background: '#fffbe8',
+          border: '2px dashed #f4a261',
+          borderRadius: '14px',
+          boxShadow: '0 2px 8px #f4a26122',
+          padding: '1em 1.2em',
+          fontFamily: 'Patrick Hand, Comic Sans MS, cursive, sans-serif',
+          fontSize: '1.08em',
+          color: '#4d2600',
+          textAlign: 'center',
+          lineHeight: 1.5,
+          letterSpacing: '0.2px',
+          userSelect: 'none',
+          opacity: 0.97,
+        }}
+        aria-live="polite"
+      >
+        <span role="img" aria-label="lightbulb" style={{marginRight: 6}}>💡</span>
+        <b>Goal Setting Tip:</b> <br />
+        <span style={{fontStyle: 'italic'}}>{randomTip}</span>
       </div>
     </>
   );
-};
+}
 
 export default Auth;
-
-/* Add keyframes for spider swing and web sling */
-// In your main.css or in a <style> tag in this file if needed:
-// @keyframes spider-swing { 0% { transform: translateY(-60px) rotate(-30deg); } 60% { transform: translateY(0) rotate(10deg); } 100% { transform: translateY(0) rotate(0deg); } }
-// @keyframes spider-web { 0% { opacity: 0; } 100% { opacity: 1; } }
-// @keyframes spider-web-sling { 0% { opacity: 0; transform: scaleY(0.2); } 100% { opacity: 1; transform: scaleY(1); } }
-// @keyframes spider-descend { 0% { transform: translateY(-100px) rotate(0deg); } 100% { transform: translateY(0) rotate(0deg); } }
