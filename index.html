@@ -10,15 +10,24 @@
   <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
 </head>
 <body>
- 
-
- 
+  <!-- Login Section -->
+  <div id="auth" style="display:block;">
+    <div id="auth-section" class="login-container">
+      <div id="sticky-note-anim" style="width:180px;height:180px;margin:0 auto 1.5rem auto;background:#fffbe7;border-radius:18px;box-shadow:0 2px 16px 0 #ffe06655;position:relative;cursor:pointer;">
+        <!-- Handwriting animation will appear here -->
+      </div>
+      <input id="email" type="email" placeholder="Email" autocomplete="username" style="display:block;margin:0 auto 1rem auto;width:80%;padding:0.7rem;font-size:1.1rem;" />
+      <input id="password" type="password" placeholder="Password" autocomplete="current-password" style="display:block;margin:0 auto 1rem auto;width:80%;padding:0.7rem;font-size:1.1rem;" />
+      <button id="btn-login" style="display:block;margin:0 auto 0.5rem auto;width:80%;padding:0.7rem;font-size:1.1rem;background:#ffe066;border:none;border-radius:8px;cursor:pointer;">Login</button>
+      <button id="btn-signup" style="display:block;margin:0 auto 1.2rem auto;width:80%;padding:0.7rem;font-size:1.1rem;background:#b8860b;color:#fff;border:none;border-radius:8px;cursor:pointer;">Sign Up</button>
+      <button id="btn-logout" style="display:none;margin:0 auto 1.2rem auto;width:80%;padding:0.7rem;font-size:1.1rem;background:#e57373;color:#fff;border:none;border-radius:8px;cursor:pointer;">Logout</button>
+      <div id="auth-status" style="margin-top:1rem;color:#b8860b;"></div>
+    </div>
+  </div>
 
   <!-- App Content -->
   <div id="app-content" style="display:none;">
     <main>
-      
-
       <!-- Daily Journal -->
       <section id="daily-journal">
         

@@ -11,6 +11,11 @@ async function addGoal() {
 
   const data = await API.saveGoal(text);
   if (data.status === "ok") {
+    // Increment goalsPinned achievement
+    let goalsPinned = parseInt(localStorage.getItem('goalsPinned') || '0', 10);
+    goalsPinned += 1;
+    localStorage.setItem('goalsPinned', goalsPinned);
+
     input.value = "";
     loadGoals();
     API.getAISteps(text).then(result => {

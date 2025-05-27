@@ -1,0 +1,76 @@
+/* Achievements section styles (moved from App.css) */
+.profile-achievements {
+  margin: 2.5rem auto 1.5rem auto;
+  background: #fffbe7;
+  border-radius: 18px;
+  box-shadow: 0 2px 16px 0 #ffe06655;
+  padding: 1.5rem 1.2rem 1.2rem 1.2rem;
+  max-width: 480px;
+  text-align: center;
+  animation: fadeIn 0.7s cubic-bezier(.4,2,.6,1.2);
+}
+.profile-achievements h3 {
+  font-family: 'Patrick Hand', cursive;
+  color: #b8860b;
+  margin-bottom: 1.1rem;
+  font-size: 1.5rem;
+  letter-spacing: 0.5px;
+}
+.tracker-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.1rem;
+  margin-bottom: 0.7rem;
+}
+.tracker-card {
+  background: #fffde4;
+  border-radius: 12px;
+  box-shadow: 0 1px 6px 0 #ffe06633;
+  padding: 1.1rem 0.5rem 0.7rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.13s cubic-bezier(.4,2,.6,1.2), box-shadow 0.13s;
+  user-select: none;
+}
+.tracker-card:hover, .tracker-card:active {
+  transform: scale(1.07) rotate(-2deg);
+  box-shadow: 0 4px 18px 0 #ffe06677;
+}
+.tracker-icon {
+  font-size: 2.1rem;
+  margin-bottom: 0.2rem;
+}
+.tracker-label {
+  font-size: 1.01rem;
+  color: #b8860b;
+}
+.tracker-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ffb300;
+  letter-spacing: 1px;
+  margin-top: 0.1rem;
+  transition: color 0.2s;
+}
+.tracker-tip {
+  font-size: 0.98rem;
+  color: #b8860b;
+  margin-top: 0.7rem;
+  font-family: 'Patrick Hand', cursive;
+  opacity: 0.85;
+}
+@keyframes pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.18) rotate(-2deg); }
+  60% { transform: scale(0.95) rotate(1deg); }
+  100% { transform: scale(1); }
+}
+.pop-anim {
+  animation: pop 0.4s cubic-bezier(.4,2,.6,1.2);
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: none; }
+}
