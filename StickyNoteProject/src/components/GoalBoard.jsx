@@ -77,35 +77,51 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote }) => {
             Drag a sticky note here to add it to your goal board!
           </div>
         )}
-        {notes.map((note, idx) => (
-          <div
-            key={idx}
-            className="sticky-note"
-            style={{
-              background: note.color || (padColors[note.colorIdx]?.color ?? '#ffe082'),
-              margin: 8,
-              display: 'inline-block',
-              verticalAlign: 'top',
-              minHeight: 120,
-              minWidth: 120,
-              maxWidth: 180,
-              wordBreak: 'break-word',
-              fontFamily: 'Patrick Hand, Comic Sans MS, cursive, sans-serif',
-              fontSize: '1.1em',
-              boxShadow: '0 4px 18px #f4a26133',
-              position: 'relative',
-              cursor: 'grab',
-            }}
-            draggable
-            onDragStart={() => setDraggedIdx(idx)}
-            onDragEnd={() => setDraggedIdx(null)}
-          >
-            <div style={{ minHeight: 80, whiteSpace: 'pre-line' }}>{note.text}</div>
-            <div style={{ position: 'absolute', bottom: 8, right: 8, fontSize: 13, color: '#555', background: '#fffbe8cc', borderRadius: 4, padding: '2px 6px' }}>
-              {note.category}
+        {notes.map((note, idx) => {
+          // Utility: get contrast color (black or white) for note background
+          function getContrastYIQ(hex) {
+            let c = hex.replace('#', '');
+            if (c.length === 3) c = c.split('').map(x => x + x).join('');
+            const r = parseInt(c.substr(0,2),16);
+            const g = parseInt(c.substr(2,2),16);
+            const b = parseInt(c.substr(4,2),16);
+            const yiq = ((r*299)+(g*587)+(b*114))/1000;
+            return yiq >= 160 ? '#222' : '#fff';
+          }
+          const bgColor = note.color || (padColors[note.colorIdx]?.color ?? '#ffe082');
+          const fontColor = getContrastYIQ(bgColor);
+          return (
+            <div
+              key={idx}
+              className="sticky-note"
+              style={{
+                background: bgColor,
+                color: fontColor,
+                margin: 8,
+                display: 'inline-block',
+                verticalAlign: 'top',
+                minHeight: 120,
+                minWidth: 120,
+                maxWidth: 180,
+                wordBreak: 'break-word',
+                fontFamily: 'Patrick Hand, Comic Sans MS, cursive, sans-serif',
+                fontSize: '1.1em',
+                boxShadow: '0 4px 18px #f4a26133',
+                position: 'relative',
+                cursor: 'grab',
+                transition: 'color 0.2s',
+              }}
+              draggable
+              onDragStart={() => setDraggedIdx(idx)}
+              onDragEnd={() => setDraggedIdx(null)}
+            >
+              <div style={{ minHeight: 80, whiteSpace: 'pre-line', color: fontColor }}>{note.text}</div>
+              <div style={{ position: 'absolute', bottom: 8, right: 8, fontSize: 13, color: fontColor === '#fff' ? '#fffbe8' : '#555', background: '#fffbe8cc', borderRadius: 4, padding: '2px 6px' }}>
+                {note.category}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
       <div
         id="sticky-trash"

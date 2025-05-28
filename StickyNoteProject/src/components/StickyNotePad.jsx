@@ -1,5 +1,21 @@
 import React, { useState, useRef } from 'react';
 
+// Returns white for dark backgrounds, black for light backgrounds
+function getContrastColor(hex) {
+  // Remove # if present
+  hex = hex.replace('#', '');
+  // Convert 3-digit hex to 6-digit
+  if (hex.length === 3) {
+    hex = hex.split('').map(x => x + x).join('');
+  }
+  const r = parseInt(hex.substr(0,2),16);
+  const g = parseInt(hex.substr(2,2),16);
+  const b = parseInt(hex.substr(4,2),16);
+  // YIQ formula
+  const yiq = (r*299 + g*587 + b*114) / 1000;
+  return yiq >= 128 ? '#5d4037' : '#fff';
+}
+
 const defaultPadColors = [
   { color: '#ffe082', label: 'Personal' },
   { color: '#ffd1dc', label: 'Academic' },
@@ -13,6 +29,7 @@ const StickyNotePad = ({ onCreate, padColors: propPadColors, onUpdateCategories 
   const [selectedColorIdx, setSelectedColorIdx] = useState(0);
   const [editCategories, setEditCategories] = useState(false);
   const [categories, setCategories] = useState(propPadColors || defaultPadColors);
+  const [pendingCategories, setPendingCategories] = useState([]); // Only used while editing
   const textareaRef = useRef(null);
 
   // When user types, update the current sticky note
@@ -46,25 +63,39 @@ const StickyNotePad = ({ onCreate, padColors: propPadColors, onUpdateCategories 
     }
   };
 
-  // Edit category label
-  const handleCategoryLabelChange = (idx, newLabel) => {
-    const updated = categories.map((cat, i) => i === idx ? { ...cat, label: newLabel } : cat);
-    setCategories(updated);
-    if (onUpdateCategories) onUpdateCategories(updated);
+  // Open edit: copy categories to pending ONCE
+  const openEditCategories = () => {
+    setPendingCategories(categories.map(cat => ({ ...cat })));
+    setEditCategories(true);
   };
 
-  // Edit color
-  const handleCategoryColorChange = (idx, newColor) => {
-    const updated = categories.map((cat, i) => i === idx ? { ...cat, color: newColor } : cat);
-    setCategories(updated);
-    if (onUpdateCategories) onUpdateCategories(updated);
+  // Apply changes
+  const applyCategoryChanges = () => {
+    setCategories(pendingCategories);
+    setEditCategories(false);
+    if (onUpdateCategories) onUpdateCategories(pendingCategories);
+  };
+
+  // Cancel changes
+  const cancelCategoryChanges = () => {
+    setEditCategories(false);
+  };
+
+  // Edit pending category label
+  const handlePendingCategoryLabelChange = (idx, newLabel) => {
+    setPendingCategories(prev => prev.map((cat, i) => i === idx ? { ...cat, label: newLabel } : cat));
+  };
+
+  // Edit pending color
+  const handlePendingCategoryColorChange = (idx, newColor) => {
+    setPendingCategories(prev => prev.map((cat, i) => i === idx ? { ...cat, color: newColor } : cat));
   };
 
   return (
     <div style={{ background: 'transparent', boxShadow: 'none', padding: 0, margin: 0 }}>
       <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', marginBottom: 8, gap: 12 }}>
         {categories.map((c, idx) => (
-          <div key={c.color + c.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginRight: 8, minWidth: 60 }}>
+          <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginRight: 8, minWidth: 60 }}>
             <button
               aria-label={c.label}
               onClick={() => setSelectedColorIdx(idx)}
@@ -97,37 +128,39 @@ const StickyNotePad = ({ onCreate, padColors: propPadColors, onUpdateCategories 
         ))}
         <button
           style={{ marginLeft: 8, background: '#fffbe8', border: '1.5px solid #bbb', borderRadius: 6, fontSize: 16, cursor: 'pointer', padding: '0 8px', height: 36, alignSelf: 'center' }}
-          onClick={() => setEditCategories((v) => !v)}
+          onClick={openEditCategories}
           title="Edit categories/colors"
         >✏️</button>
       </div>
       {editCategories && (
         <div
           style={{ background: '#fffbe8', border: '1.5px solid #f4a261', borderRadius: 8, padding: 8, marginBottom: 8 }}
-          onMouseDown={e => e.stopPropagation()} // Prevent parent click events
-          onClick={e => e.stopPropagation()} // Prevent parent click events
+          onMouseDown={e => e.stopPropagation()}
+          onClick={e => e.stopPropagation()}
         >
           <b>Edit Categories</b>
-          {categories.map((cat, idx) => (
-            <div key={cat.color + cat.label + idx} style={{ display: 'flex', alignItems: 'center', margin: '6px 0' }}>
+          {pendingCategories.map((cat, idx) => (
+            <div key={idx} style={{ display: 'flex', alignItems: 'center', margin: '6px 0' }}>
               <input
                 type="color"
                 value={cat.color}
-                onChange={e => handleCategoryColorChange(idx, e.target.value)}
+                onChange={e => handlePendingCategoryColorChange(idx, e.target.value)}
                 style={{ width: 38, height: 38, border: 'none', marginRight: 12, background: 'none', cursor: 'pointer' }}
-                onMouseDown={e => e.stopPropagation()} // Prevent closing edit mode when clicking color picker
-                onClick={e => e.stopPropagation()} // Prevent closing edit mode when clicking color picker
-                onBlur={e => e.preventDefault()} // Prevent blur from closing the color picker
-                tabIndex={-1} // Prevent focus loss
+                onMouseDown={e => e.stopPropagation()}
+                onClick={e => e.stopPropagation()}
               />
               <input
                 type="text"
                 value={cat.label}
-                onChange={e => handleCategoryLabelChange(idx, e.target.value)}
+                onChange={e => handlePendingCategoryLabelChange(idx, e.target.value)}
                 style={{ fontSize: 16, borderRadius: 4, border: '1px solid #ccc', padding: '4px 10px', marginRight: 8 }}
               />
             </div>
           ))}
+          <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+            <button onClick={applyCategoryChanges} style={{ background: '#44bba4', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 18px', fontWeight: 600, cursor: 'pointer' }}>Apply</button>
+            <button onClick={cancelCategoryChanges} style={{ background: '#bbb', color: '#333', border: 'none', borderRadius: 6, padding: '6px 18px', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
+          </div>
         </div>
       )}
       <div
@@ -161,7 +194,7 @@ const StickyNotePad = ({ onCreate, padColors: propPadColors, onUpdateCategories 
           rows={6}
           className="sticky-note-input"
           style={{
-            fontFamily: `'Patrick Hand', cursive`,
+            fontFamily: 'Patrick Hand, Comic Sans MS, cursive, sans-serif',
             background: 'transparent',
             border: 'none',
             outline: 'none',
@@ -169,8 +202,9 @@ const StickyNotePad = ({ onCreate, padColors: propPadColors, onUpdateCategories 
             height: '100%',
             resize: 'none',
             fontSize: '1.15em',
-            color: '#5d4037',
+            color: getContrastColor(categories[selectedColorIdx].color),
             padding: '1em 1em 1.5em 1em',
+            fontWeight: 700, // Make font bold to match board
           }}
           autoFocus
         />

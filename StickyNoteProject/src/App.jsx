@@ -45,6 +45,19 @@ function App() {
     return () => unsubscribe();
   }, []);
 
+  // Load sticky notes from localStorage on mount
+  useEffect(() => {
+    const savedNotes = localStorage.getItem('stickyNotes');
+    if (savedNotes) {
+      setStickyNotes(JSON.parse(savedNotes));
+    }
+  }, []);
+
+  // Save sticky notes to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('stickyNotes', JSON.stringify(stickyNotes));
+  }, [stickyNotes]);
+
   // Add a sticky note to the board
   const handleDropNote = (note) => {
     setStickyNotes((prev) => [...prev, note]);
@@ -52,7 +65,14 @@ function App() {
 
   // Remove a sticky note by index
   const handleDeleteNote = (idx) => {
-    setStickyNotes((prev) => prev.filter((_, i) => i !== idx));
+    setStickyNotes((prev) => {
+      const updated = prev.filter((_, i) => i !== idx);
+      // Save trashed notes
+      const trashed = JSON.parse(localStorage.getItem('trashedStickyNotes') || '[]');
+      trashed.push(prev[idx]);
+      localStorage.setItem('trashedStickyNotes', JSON.stringify(trashed));
+      return updated;
+    });
   };
 
   // Update categories/colors for sticky notes

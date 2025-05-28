@@ -134,15 +134,7 @@ button:hover {
 }
 
 .sticky-note::before {
-  content: "";
-  width: 20px;
-  height: 20px;
-  background: radial-gradient(circle, #b22222 40%, transparent 41%);
-  border-radius: 50%;
-  position: absolute;
-  top: -10px;
-  left: calc(50% - 10px);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  display: none !important;
 }
 
 /* Counselor style */
