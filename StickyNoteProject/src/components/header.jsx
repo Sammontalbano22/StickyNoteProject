@@ -119,7 +119,7 @@ const Header = () => {
           </h1>
         </div>
         {user && (
-          <div style={{ position: 'absolute', right: 0, top: 0, zIndex: 20 }}>
+          <div style={{ position: 'absolute', right: '4em', top: 0, zIndex: 20 }}>
             <button
               onClick={() => setShowProfile((v) => !v)}
               style={{
@@ -162,7 +162,7 @@ const Header = () => {
               <span style={{ fontWeight: 600, maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.displayName || user.email?.split('@')[0] || 'User'}</span>
             </button>
             {showProfile && (
-              <div style={{
+              <div className="profile-dropdown-box" style={{
                 position: 'absolute', right: 0, top: 48,
                 background: 'linear-gradient(135deg, #fffbe8 80%, #ffe082 100%)',
                 border: '3px solid #f4a261',
@@ -170,6 +170,7 @@ const Header = () => {
                 boxShadow: '0 8px 32px #f4a26155, 0 2px 0 #fffbe8 inset, 0 0 0 4px #ffd1dc55',
                 padding: '1.2em 1.7em 0.7em 1.7em',
                 minWidth: 280,
+                maxWidth: '90vw',
                 zIndex: 100,
                 fontFamily: 'Patrick Hand, Comic Sans MS, cursive, sans-serif',
                 color: '#4d2600',
@@ -180,6 +181,7 @@ const Header = () => {
                 transition: 'box-shadow 0.2s, border 0.2s, background 0.2s',
                 outline: '2.5px solid #ffd1dc',
                 outlineOffset: '2px',
+                boxSizing: 'border-box',
               }}>
                 <div style={{ fontWeight: 700, fontSize: '1.18em', marginBottom: 2, display: 'flex', alignItems: 'center', gap: 8 }}>
                   <img src={avatarUrl} alt="avatar" style={{ width: 48, height: 48, borderRadius: '50%', background: avatarBg }} />

@@ -118,84 +118,6 @@ function addDropdownOption(goal, dropdown) {
   dropdown.appendChild(option);
 }
 
-function renderMilestone(text, goalId, isChecked, milestoneId = null) {
-  const li = document.createElement("li");
-  const checkbox = document.createElement("input");
-  checkbox.type = "checkbox";
-  checkbox.checked = isChecked;
-  checkbox.dataset.goalId = goalId;
-  if (milestoneId) checkbox.dataset.milestoneId = milestoneId;
-
-  checkbox.onchange = async () => {
-    li.classList.toggle("done", checkbox.checked);
-    updateGoalProgress(goalId);
-
-    if (milestoneId) {
-      await API.updateMilestone(goalId, milestoneId, checkbox.checked);
-    }
-  };
-
-  const deleteBtn = document.createElement("span");
-  deleteBtn.textContent = "🗑️";
-  deleteBtn.className = "delete-btn";
-  deleteBtn.onclick = async () => {
-    li.remove();
-    updateGoalProgress(goalId);
-    if (milestoneId) {
-      await API.deleteMilestone(goalId, milestoneId);
-    }
-  };
-
-  li.textContent = text;
-  li.prepend(checkbox);
-  li.appendChild(deleteBtn);
-  li.classList.toggle("done", isChecked);
-  li.dataset.goalId = goalId;
-
-  document.getElementById("milestone-list").appendChild(li);
-}
-
-function addMilestone() {
-  const input = document.getElementById("milestone-input");
-  const text = input.value.trim();
-  const goalId = document.getElementById("milestone-goal-select").value;
-
-  if (!text || !goalId) {
-    alert("⚠️ Please enter a milestone and select a goal.");
-    return;
-  }
-
-  API.addMilestone(goalId, text).then(data => {
-    if (data.status === "ok") {
-      renderMilestone(text, goalId, false, data.id);
-      input.value = "";
-    }
-  });
-}
-
-function acceptStep(stepText, button) {
-  const goalId = document.getElementById('milestone-goal-select').value;
-  if (!goalId) return alert("⚠️ Please select a goal to attach this milestone.");
-
-  const parent = button.parentElement;
-  const statusMessage = document.createElement("p");
-  statusMessage.innerText = "⏳ Creating milestone...";
-  parent.appendChild(statusMessage);
-
-  API.addMilestone(goalId, stepText).then(data => {
-    if (data.status === "ok") {
-      renderMilestone(stepText, goalId, false, data.id);
-      parent.remove();
-    } else {
-      statusMessage.innerText = "❌ Failed to create milestone.";
-    }
-  });
-}
-
-function rejectStep(button) {
-  button.parentElement.remove();
-}
-
 function displayAISteps(steps, goalText) {
   const suggestionsDiv = document.getElementById("suggested-goals");
   suggestionsDiv.innerHTML = "";
@@ -284,16 +206,12 @@ window.addGoal = addGoal;
 window.loadGoals = loadGoals;
 window.acceptStep = acceptStep;
 window.rejectStep = rejectStep;
-window.renderMilestone = renderMilestone;
-window.addMilestone = addMilestone;
 window.loadCardBack = loadCardBack;
 window.updateGoalProgress = updateGoalProgress;
 
 export {
   addGoal,
   loadGoals,
-  addMilestone,
-  renderMilestone,
   updateGoalProgress,
   displayAISteps,
   loadCardBack

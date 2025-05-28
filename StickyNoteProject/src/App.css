@@ -1,10 +1,55 @@
+/*─────────────────────────────────────────────────────────────────────────────
+  Global and #root setup
+─────────────────────────────────────────────────────────────────────────────*/
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  /* full-viewport container, no margins */
+  min-height: 100vh;
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: #fffbe8;
+
+  /* stack children vertically, align center horizontally,
+     but start at top instead of centering vertically */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
 }
 
+/*─────────────────────────────────────────────────────────────────────────────
+  App container
+─────────────────────────────────────────────────────────────────────────────*/
+.App {
+  width: 100%;
+  min-height: 100vh;
+  padding-top: 7.5em; /* space for sticky header */
+
+  /* same vertical‐start layout so header can sit lower */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/*─────────────────────────────────────────────────────────────────────────────
+  Auth sections
+─────────────────────────────────────────────────────────────────────────────*/
+#auth-section,
+#auth {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  min-width: 320px;
+}
+
+/*─────────────────────────────────────────────────────────────────────────────
+  Logo hover effects
+─────────────────────────────────────────────────────────────────────────────*/
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -19,12 +64,8 @@
 }
 
 @keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -33,17 +74,45 @@
   }
 }
 
+/*─────────────────────────────────────────────────────────────────────────────
+  Cards and docs link
+─────────────────────────────────────────────────────────────────────────────*/
 .card {
   padding: 2em;
 }
-
 .read-the-docs {
   color: #888;
 }
 
+/*─────────────────────────────────────────────────────────────────────────────
+  Header styling
+─────────────────────────────────────────────────────────────────────────────*/
 header {
-  margin-bottom: 2.5em;
+  position: sticky;
+  top: 0;
+  z-index: 2000;
+
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  /* Increase right padding to ensure profile trigger is never flush with edge */
+  padding: 2.5em 4.5em 1.5em 1.5em;
   text-align: center;
+  background: linear-gradient(90deg, #ffe082 0%, #ffd1dc 100%);
+  box-shadow: 0 4px 24px #f4a26133;
+  border-bottom-left-radius: 24px;
+  border-bottom-right-radius: 24px;
+
+  /* allow overflow so the always-visible name/emoji box isn’t clipped */
+  overflow-x: visible;
+  overflow-y: visible;
+}
+
+@media (max-width: 600px) {
+  header {
+    padding: 1.5em 2.5em 1.5em 0.5em;
+    box-sizing: border-box;
+  }
 }
 
 header h1 {
@@ -54,14 +123,87 @@ header h1 {
   letter-spacing: 1px;
   text-shadow: 1px 2px 0 #fffbe8, 2px 4px 8px #f4a26144;
 }
-
 header h2 {
   font-family: 'Patrick Hand', cursive;
   font-weight: 400;
   font-size: 1.5em;
   color: #333;
-  margin-top: 0;
-  margin-bottom: 0.7em;
+  margin: 0 0 0.7em;
   letter-spacing: 0.5px;
   text-shadow: 1px 1px 0 #ffe082;
 }
+
+/*─────────────────────────────────────────────────────────────────────────────
+  Auth buttons
+─────────────────────────────────────────────────────────────────────────────*/
+#auth-section button,
+#auth button,
+.auth-btn,
+.login-btn,
+.signup-btn {
+  border-radius: 12px !important;
+  width: 56px;
+  height: 56px;
+  aspect-ratio: 1/1;
+  padding: 0;
+  font-size: 2em;
+  background: #ffe082;
+  color: #4d2600;
+  box-shadow: 0 4px 16px #f4a26133;
+  border: 2px solid #f4a261;
+  transition: box-shadow 0.2s, background 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+#auth-section button:hover,
+#auth button:hover,
+.auth-btn:hover,
+.login-btn:hover,
+.signup-btn:hover {
+  background: #ffd1dc;
+  box-shadow: 0 8px 32px #f4a26155;
+  color: #a67c52;
+}
+
+/*─────────────────────────────────────────────────────────────────────────────
+  Profile dropdown
+─────────────────────────────────────────────────────────────────────────────*/
+.profile-dropdown-box {
+  position: fixed !important;
+  top: 6.5em !important;
+  /* Move further from right edge to avoid clipping, now 4em from right */
+  right: 4em !important;
+  left: auto !important;
+  min-width: 260px;
+  max-width: 80vw;
+  box-sizing: border-box;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  z-index: 3000;
+  background: linear-gradient(135deg, #fffbe8 80%, #ffe082 100%);
+  border: 3px solid #f4a261;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px #f4a26155,
+              0 2px 0 #fffbe8 inset,
+              0 0 0 4px #ffd1dc55;
+  padding: 1.2em 1.5em 0.7em 1.5em;
+  margin-top: 0.5em;
+}
+
+@media (max-width: 600px) {
+  .profile-dropdown-box {
+    min-width: 90vw;
+    max-width: 98vw;
+    right: 1vw !important;
+    left: auto !important;
+    padding: 1em 0.5em 0.7em 0.5em !important;
+    margin-top: 0.7em;
+  }
+}
+
+/*─────────────────────────────────────────────────────────────────────────────
+  (Removed page‐wide overflow‐hidden to allow the small profile trigger box
+   to remain fully visible at the edge.)
+─────────────────────────────────────────────────────────────────────────────*/
+/* body { overflow-x: hidden; } */
