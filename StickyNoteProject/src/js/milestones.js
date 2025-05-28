@@ -201,6 +201,27 @@ async function loadCardBack(container, goalId) {
   container.appendChild(inner);
 }
 
+// Accept a suggested step and add it as a milestone for the selected goal
+async function acceptStep(step, btn) {
+  const goalId = document.getElementById("goal-select").value;
+  if (!goalId) {
+    alert("⚠️ Please select a goal first.");
+    return;
+  }
+  try {
+    const data = await API.addMilestone(goalId, step);
+    if (data.status === "ok") {
+      btn.parentElement.remove(); // Remove the suggestion from the UI
+      loadGoals(); // Refresh milestones
+    } else {
+      alert("❌ Failed to add milestone: " + data.error);
+    }
+  } catch (err) {
+    alert("❌ Error adding milestone.");
+    console.error(err);
+  }
+}
+
 // Expose globally
 window.addGoal = addGoal;
 window.loadGoals = loadGoals;

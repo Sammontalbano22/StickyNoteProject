@@ -8,6 +8,8 @@ import StickyNotePad from './components/StickyNotePad.jsx';
 import GoalBoard from './components/GoalBoard.jsx';
 import GoalShowroom from './components/GoalShowroom';
 import WidgetBar from './components/WidgetBar';
+import VirtualCounselor from './components/VirtualCounselor.jsx';
+import counselorImg from './assets/counselor.png'; // You need to add a sharp-looking image to src/assets/counselor.png
 
 import { auth } from './js/firebase-init.js';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -21,6 +23,7 @@ function App() {
   const [showShowroom, setShowShowroom] = useState(false);
   const [pinnedGoals, setPinnedGoals] = useState([]); // {text, color, category, completedAt}
   const [completedGoals, setCompletedGoals] = useState([]); // {text, color, category, completedAt}
+  const [showCounselor, setShowCounselor] = useState(false);
   const stickyMessage = "I am Accomplishing my Goals!";
 
   useEffect(() => {
@@ -164,6 +167,10 @@ function App() {
             <div>
               <h2 style={{ fontFamily: 'Patrick Hand, Comic Sans MS, cursive', color: '#4d2600', marginBottom: 8 }}>Sticky Note Pad</h2>
               <StickyNotePad onCreate={handleDropNote} padColors={padCategories} onUpdateCategories={handleUpdateCategories} />
+              {/* Virtual Life Counselor Widget */}
+              {/* <div style={{ marginTop: 32 }}>
+                <VirtualCounselor />
+              </div> */}
             </div>
             <div>
               <h2 style={{ fontFamily: 'Patrick Hand, Comic Sans MS, cursive', color: '#4d2600', marginBottom: 8 }}>Goal Board</h2>
@@ -182,6 +189,86 @@ function App() {
             <div style={{ background: '#fffbe8', border: '2.5px solid #ffd1dc', borderRadius: 18, boxShadow: '0 8px 32px #f4a26155', minWidth: 400, maxWidth: 1000, width: '90vw', maxHeight: '90vh', overflowY: 'auto', padding: 0, zIndex: 9999, position: 'relative' }}>
               <button onClick={() => setShowShowroom(false)} style={{ position: 'absolute', top: 18, right: 18, background: '#ffd1dc', color: '#4d2600', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 18, padding: '8px 24px', cursor: 'pointer', zIndex: 10000 }}>Close</button>
               <GoalShowroom pinnedGoals={pinnedGoals} completedGoals={completedGoals} onUnpin={handleUnpin} />
+            </div>
+          </div>
+        )}
+        {isLoggedIn && !showWelcomeSticky && (
+          <button
+            onClick={() => setShowCounselor(true)}
+            style={{
+              position: 'fixed',
+              bottom: 32,
+              right: 32,
+              zIndex: 3000,
+              background: 'linear-gradient(135deg, #ffd1dc 60%, #b3e5fc 100%)',
+              border: '3px solid #ffd54f',
+              borderRadius: 18,
+              padding: '10px 28px 10px 18px',
+              boxShadow: '0 4px 24px #ffd1dc55, 0 2px 0 #fffbe8 inset',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 14,
+              fontFamily: 'Patrick Hand, Comic Sans MS, cursive, sans-serif',
+              fontWeight: 700,
+              fontSize: 20,
+              color: '#283593',
+              cursor: 'pointer',
+              transition: 'box-shadow 0.2s, transform 0.2s',
+            }}
+            aria-label="Open Virtual Counselor"
+            onMouseOver={e => (e.currentTarget.style.boxShadow = '0 8px 32px #1976d2aa')}
+            onMouseOut={e => (e.currentTarget.style.boxShadow = '0 4px 24px #ffd1dc55, 0 2px 0 #fffbe8 inset')}
+          >
+            <img
+              src={counselorImg}
+              alt="Virtual Counselor"
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: '50%',
+                border: '2.5px solid #ffd54f',
+                boxShadow: '0 2px 8px #f4a26188',
+                background: '#fffbe8',
+                objectFit: 'cover',
+                marginRight: 8,
+                transition: 'box-shadow 0.2s, transform 0.2s',
+              }}
+            />
+            <span style={{ fontWeight: 900, fontSize: 22, color: '#b35c00', letterSpacing: 0.2 }}>Virtual Counselor</span>
+          </button>
+        )}
+        {showCounselor && (
+          <div style={{
+            position: 'fixed',
+            bottom: 110,
+            right: 40,
+            zIndex: 4000,
+            background: 'none',
+          }}>
+            <div style={{
+              position: 'relative',
+              background: 'none',
+            }}>
+              <button
+                onClick={() => setShowCounselor(false)}
+                style={{
+                  position: 'absolute',
+                  top: -18,
+                  right: -18,
+                  background: '#ffd1dc',
+                  color: '#4d2600',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: 32,
+                  height: 32,
+                  fontWeight: 700,
+                  fontSize: 18,
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 8px #0002',
+                }}
+                aria-label="Close Counselor"
+              >×</button>
+              <VirtualCounselor />
             </div>
           </div>
         )}

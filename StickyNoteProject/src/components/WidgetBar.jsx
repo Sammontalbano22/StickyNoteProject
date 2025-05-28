@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
+import HabitTracker from './HabitTracker';
 
 // Default widget types
 const WIDGET_TYPES = [
   { type: 'quote', label: 'Inspirational Quote' },
   { type: 'image', label: 'Image' },
-  { type: 'playlist', label: 'Playlist' }
+  { type: 'playlist', label: 'Playlist' },
+  { type: 'habit', label: 'Habit Tracker' }, // Added Habit Tracker
 ];
 
 const SPOTIFY_WIDTH = 340;
-const SPOTIFY_HEIGHT = 152;
+const SPOTIFY_HEIGHT = 80;
 const WIDGET_WIDTH = SPOTIFY_WIDTH;
 const WIDGET_HEIGHT = SPOTIFY_HEIGHT;
 
@@ -20,7 +22,7 @@ const WidgetsArea = ({ widgets, onRemove, onMove, onDragStart, onDragOver, onDro
     gap: 28,
     justifyContent: 'flex-start',
     alignItems: 'flex-end',
-    margin: '0 auto 32px auto',
+    margin: '0 auto -96px auto', // negative bottom margin to move up the rest of the page by ~1 inch (96px)
     maxWidth: 1200,
     minHeight: widgets.length ? WIDGET_HEIGHT : 0,
     position: 'relative',
@@ -81,18 +83,22 @@ const WidgetsArea = ({ widgets, onRemove, onMove, onDragStart, onDragOver, onDro
           style={{
             position: 'absolute',
             top: 10,
-            right: 14,
+            left: 14, // move X to top left
             background: 'rgba(255,255,255,0.85)',
             color: '#e76f51',
             border: 'none',
             fontWeight: 900,
-            fontSize: 26,
+            fontSize: 18,
             cursor: 'pointer',
             opacity: 0.7,
             borderRadius: 16,
             boxShadow: '0 1px 4px #ffd1dc33',
             transition: 'opacity 0.18s',
             zIndex: 20,
+            width: 28,
+            height: 28,
+            lineHeight: '20px',
+            padding: 0
           }}
           title="Remove"
           onMouseEnter={e => e.currentTarget.style.opacity = 1}
@@ -150,13 +156,13 @@ const WidgetsArea = ({ widgets, onRemove, onMove, onDragStart, onDragOver, onDro
               alt="widget"
               style={{
                 width: '100%',
-                height: '100%',
+                height: '50%',
                 borderRadius: 16,
                 boxShadow: '0 2px 12px #b3e5fc44',
                 objectFit: 'cover',
                 background: '#fff',
                 maxWidth: '100%',
-                maxHeight: '100%',
+                maxHeight: '50%',
                 display: 'block'
               }}
             />
@@ -193,8 +199,8 @@ const WidgetsArea = ({ widgets, onRemove, onMove, onDragStart, onDragOver, onDro
               <iframe
                 src={safeEmbedUrl}
                 title="Spotify Playlist"
-                width="100%"
-                height="200%"
+                width={SPOTIFY_WIDTH}
+                height={SPOTIFY_HEIGHT}
                 frameBorder="0"
                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                 allowFullScreen
@@ -205,6 +211,12 @@ const WidgetsArea = ({ widgets, onRemove, onMove, onDragStart, onDragOver, onDro
             );
           })()
         }
+        {w.type === 'habit' && (
+          <div style={{ width: '100%', height: '100%' }}>
+            {/* Render the HabitTracker widget */}
+            <HabitTracker />
+          </div>
+        )}
         {/* Goal tag pill */}
         {w.goal && w.goal.trim() && (
           <div style={{
@@ -255,7 +267,8 @@ const App = () => {
   }, [widgets]);
 
   const handleAddWidget = () => {
-    if (!newWidget.content.trim()) return;
+    // For habit tracker, allow empty content
+    if (newWidget.type !== 'habit' && !newWidget.content.trim()) return;
     setWidgets(w => [...w, { ...newWidget }]);
     setNewWidget({ type: 'quote', content: '', goal: '' });
     setAdding(false);
@@ -420,6 +433,11 @@ const App = () => {
                   three dots on a playlist in Spotify → Share → "Embed playlist".
                 </div>
               </>
+            )}
+            {newWidget.type === 'habit' && (
+              <div style={{ fontSize: 15, color: '#888', marginBottom: 8 }}>
+                The Habit Tracker widget helps you check off daily habits. No extra setup needed!
+              </div>
             )}
             <label style={{
               fontWeight: 900,
