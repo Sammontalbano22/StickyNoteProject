@@ -230,18 +230,12 @@ app.get('/journal', verifyUser, async (req, res) => {
 
 // ─── AI Steps Generator ─────────────────────────
 app.post('/generate-steps', async (req, res) => {
-  const { goal } = req.body;
+  const { goal, category } = req.body;
   if (!goal) {
     return res.status(400).json({ error: 'Goal text is required' });
   }
 
-  const prompt = `
-You are a goal planning assistant. The user wants to accomplish this long-term goal:
-
-"${goal}"
-
-Break this goal down into 3–5 small, actionable short-term steps they can start working on this week. Make each step clear and specific.
-`;
+  const prompt = `You are an expert life coach. People will come to you with a long term goal they want to achieve in the category of ${category || 'general'}.\n"${goal}"\n\nBreak this goal down into 3–5 small, actionable short-term steps they can start working on this week. Make each step clear and specific, and ensure they are relevant to the category: ${category || 'general'}.`;
 
   try {
     const completion = await openai.chat.completions.create({
@@ -266,22 +260,47 @@ app.post('/api/ai-suggest-milestones', async (req, res) => {
   if (!goal) return res.status(400).json({ error: 'Missing goal' });
   try {
     const completion = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4',
       messages: [
-        { role: 'system', content: 'You are an assistant that helps break down goals into actionable short-term milestones.' },
-        { role: 'user', content: `Suggest 3-5 short-term, actionable milestones for the following goal. Respond with a plain list, no explanations.\nGoal: ${goal}` }
+        { role: 'system', content: 'You are an expert life coach and project manager. For any goal, you provide a list of 10 highly detailed, actionable, and thoughtful milestone suggestions. Each milestone should be specific, practical, and impactful. Do not include explanations, just the list.' },
+        { role: 'user', content: `Suggest 10 highly detailed, actionable, and thoughtful short-term milestones for the following goal. Each milestone should be a single, clear, specific action or step. Respond with a plain list, no explanations.\nGoal: ${goal}` }
       ],
-      max_tokens: 120,
-      temperature: 0.6
+      max_tokens: 400,
+      temperature: 0.7
     });
     const content = completion.choices[0].message.content;
-    const suggestions = content
+    let suggestions = content
       .split(/\n|\r/)
       .map(line => line.replace(/^[-*\d.\s]+/, '').trim())
       .filter(line => line.length > 0);
+    if (suggestions.length < 8 || suggestions.some(s => s.toLowerCase().includes('no suggestions'))) {
+      suggestions = [
+        'Break the goal into 3-5 clear, actionable sub-tasks.',
+        'Research best practices or gather resources related to the goal.',
+        'Set a realistic timeline and deadlines for each sub-task.',
+        'Identify potential obstacles and plan solutions in advance.',
+        'Find an accountability partner or mentor for support.',
+        'Schedule regular check-ins to review progress and adjust plans.',
+        'Track your progress in a journal or log.',
+        'Celebrate small wins and milestones along the way.',
+        'Reflect on what’s working and what isn’t; adjust as needed.',
+        'Prepare a summary or presentation of your results/learning.'
+      ];
+    }
     return res.json({ suggestions });
   } catch (e) {
-    return res.json({ suggestions: ['(Error fetching suggestions)'] });
+    return res.json({ suggestions: [
+      'Break the goal into 3-5 clear, actionable sub-tasks.',
+      'Research best practices or gather resources related to the goal.',
+      'Set a realistic timeline and deadlines for each sub-task.',
+      'Identify potential obstacles and plan solutions in advance.',
+      'Find an accountability partner or mentor for support.',
+      'Schedule regular check-ins to review progress and adjust plans.',
+      'Track your progress in a journal or log.',
+      'Celebrate small wins and milestones along the way.',
+      'Reflect on what’s working and what isn’t; adjust as needed.',
+      'Prepare a summary or presentation of your results/learning.'
+    ] });
   }
 });
 

@@ -114,7 +114,7 @@ const StickyNotePad = ({ onCreate, padColors: propPadColors, onUpdateCategories 
         <button
           aria-label="Sticky Note Help"
           style={{ background: '#fffbe8', border: '1.5px solid #bbb', borderRadius: 8, fontSize: 18, cursor: 'pointer', padding: '0 10px', height: 32, marginRight: 8 }}
-          onClick={() => setShowHelp(true)}
+          onClick={() => setShowHelp(v => !v)}
           title="How does this work?"
         >❓</button>
       </div>

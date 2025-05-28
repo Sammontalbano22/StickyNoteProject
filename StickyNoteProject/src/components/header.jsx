@@ -20,7 +20,7 @@ const stickyNotes = [
   { color: stickyColors[3], right: 60, top: 120, rotate: 6, z: 2 },
 ];
 
-const Header = () => {
+const Header = ({ onShowShowroom }) => {
   const [user, setUser] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
   const [avatarStyle, setAvatarStyle] = useState(() => localStorage.getItem('sticky_avatar_style') || 'adventurer');
@@ -249,6 +249,23 @@ const Header = () => {
                 >
                   🚪 Sign Out
                 </button>
+                <button
+                  onClick={() => { setShowProfile(false); if (onShowShowroom) onShowShowroom(); }}
+                  style={{
+                    background: '#ffe082',
+                    color: '#b35c00',
+                    border: '2px solid #ffd1dc',
+                    borderRadius: 10,
+                    fontWeight: 700,
+                    fontSize: 18,
+                    padding: '10px 28px',
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 8px #ffd1dc33',
+                    margin: '1.2em 0 0.5em 0',
+                    width: '100%',
+                    display: 'block',
+                  }}
+                >🏅 Showroom</button>
               </div>
             )}
           </div>

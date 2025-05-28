@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 // Use backend proxy for AI suggestions
 async function getSuggestedMilestones(goalText) {
@@ -34,7 +34,7 @@ const TRASH_ICON = (
   </svg>
 );
 
-const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote }) => {
+const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote, onMountShowroom }) => {
   const [dragOver, setDragOver] = useState(false);
   const [draggedIdx, setDraggedIdx] = useState(null);
   const [trashOver, setTrashOver] = useState(false);
@@ -43,6 +43,9 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote }) => {
   const [activeSuggestionIdx, setActiveSuggestionIdx] = useState(null); // For showing suggestions outside sticky note
   const [enlargedNotes, setEnlargedNotes] = useState({}); // {idx: true/false}
   const [milestoneModalIdx, setMilestoneModalIdx] = useState(null);
+  const [enlargedMilestone, setEnlargedMilestone] = useState(null); // {noteIdx, msIdx} or null
+  const [completedGoalIdx, setCompletedGoalIdx] = useState(null);
+  const [hasReportedComplete, setHasReportedComplete] = useState({}); // {idx: true}
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -74,6 +77,68 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote }) => {
       onDeleteNote(draggedIdx);
       setDraggedIdx(null);
     }
+  };
+
+  // Confetti trigger
+  function showConfetti() {
+    if (window.triggerConfetti) window.triggerConfetti();
+  }
+
+  // Watch for newly completed goals
+  useEffect(() => {
+    notes.forEach((note, idx) => {
+      const validMilestones = (note.milestones || []).filter(ms => ms.text && ms.text.trim() !== '');
+      const allChecked = validMilestones.length > 0 && validMilestones.every(ms => ms.checked);
+      if (allChecked && !hasReportedComplete[idx]) {
+        setCompletedGoalIdx(idx);
+        setHasReportedComplete(prev => ({ ...prev, [idx]: true }));
+        showConfetti();
+      } else if (!allChecked && hasReportedComplete[idx]) {
+        setHasReportedComplete(prev => {
+          const copy = { ...prev };
+          delete copy[idx];
+          return copy;
+        });
+      }
+    });
+  }, [notes]);
+
+  // Modal action handlers
+  const handleShareGoal = () => {
+    if (completedGoalIdx == null) return;
+    const note = notes[completedGoalIdx];
+    const text = `I just accomplished my goal: "${note.text}"! 🎉`;
+    if (navigator.share) {
+      navigator.share({ title: 'Goal Accomplished!', text });
+    } else {
+      navigator.clipboard.writeText(text);
+      alert('Goal copied to clipboard!');
+    }
+  };
+  const handleShareFacebook = () => {
+    if (completedGoalIdx == null) return;
+    const note = notes[completedGoalIdx];
+    const text = `I just accomplished my goal: \"${note.text}\"! 🎉`;
+    const url = encodeURIComponent(window.location.origin);
+    const quote = encodeURIComponent(text);
+    const fbShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${quote}`;
+    window.open(fbShareUrl, '_blank', 'noopener,noreferrer,width=600,height=500');
+  };
+  const handleDeleteGoal = () => {
+    if (completedGoalIdx == null) return;
+    onDeleteNote(completedGoalIdx);
+    setCompletedGoalIdx(null);
+  };
+  const handleReflectGoal = () => {
+    // Open journal/reflect UI (mock: alert for now)
+    if (completedGoalIdx == null) return;
+    alert('Reflect on your goal! (This should open the journal UI.)');
+    setCompletedGoalIdx(null);
+  };
+  const handleMountShowroom = () => {
+    if (completedGoalIdx == null) return;
+    if (onMountShowroom) onMountShowroom(notes[completedGoalIdx]);
+    setCompletedGoalIdx(null);
   };
 
   return (
@@ -181,7 +246,10 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote }) => {
                 background: bgColor,
                 color: fontColor,
                 margin: 8,
-                display: 'inline-block',
+                display: 'inline-flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-start',
+                alignItems: 'stretch',
                 verticalAlign: 'top',
                 minHeight: isEnlarged ? 260 : 120,
                 minWidth: isEnlarged ? 260 : 120,
@@ -196,77 +264,180 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote }) => {
                 cursor: 'grab',
                 transition: 'all 0.22s cubic-bezier(.4,2,.6,.9)',
                 zIndex: isEnlarged ? 10 : 1,
+                borderRadius: 18,
+                padding: isEnlarged ? '18px 18px 16px 18px' : '12px 12px 10px 12px',
+                overflow: 'auto', // allow scrolling for all content
               }}
               draggable
               onDragStart={() => setDraggedIdx(idx)}
               onDragEnd={() => setDraggedIdx(null)}
             >
-              {/* Enlarge/Shrink button */}
-              <button
-                aria-label={isEnlarged ? 'Shrink sticky note' : 'Enlarge sticky note'}
-                onClick={e => {
-                  e.stopPropagation();
-                  setEnlargedNotes(prev => ({ ...prev, [idx]: !isEnlarged }));
-                }}
-                style={{
-                  position: 'absolute',
-                  top: 8,
-                  left: 8,
-                  zIndex: 20,
-                  background: isEnlarged ? '#ffd1dc' : '#b3e5fc',
-                  color: '#4d2600',
-                  border: 'none',
-                  borderRadius: 8,
-                  fontWeight: 700,
-                  fontSize: isEnlarged ? 22 : 18,
-                  width: isEnlarged ? 38 : 28,
-                  height: isEnlarged ? 38 : 28,
-                  boxShadow: '0 2px 8px #f4a26122',
-                  cursor: 'pointer',
-                  outline: isEnlarged ? '2px solid #f4a261' : 'none',
-                  transition: 'all 0.18s',
-                }}
-                title={isEnlarged ? 'Shrink note' : 'Enlarge note'}
-              >{isEnlarged ? '−' : '+'}</button>
-              {/* View Milestones Button */}
-              <button
-                aria-label="View milestones"
-                onClick={e => {
-                  e.stopPropagation();
-                  setMilestoneModalIdx(idx);
-                }}
-                style={{
-                  position: 'absolute',
-                  top: 8,
-                  right: 8,
-                  zIndex: 20,
-                  background: '#fffbe8',
-                  color: '#4d2600',
-                  border: '1.5px solid #f4a261',
-                  borderRadius: 8,
-                  fontWeight: 700,
-                  fontSize: 18,
-                  width: 28,
-                  height: 28,
-                  boxShadow: '0 2px 8px #f4a26122',
-                  cursor: 'pointer',
-                  outline: 'none',
-                  transition: 'all 0.18s',
+              {/* Top bar: Category & Actions */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                {/* Category pill: shrink, subtle, and single-line */}
+                <span style={{
+                  fontSize: isEnlarged ? 14 : 11,
+                  color: fontColor === '#fff' ? '#fffbe8' : '#555',
+                  background: '#fffbe8cc',
+                  borderRadius: 10,
+                  padding: isEnlarged ? '2px 10px' : '1px 7px',
+                  fontWeight: 600,
+                  letterSpacing: 0.2,
+                  maxWidth: isEnlarged ? 120 : 70,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  border: '1px solid #ffe082',
+                  boxShadow: '0 1px 2px #ffd1dc22',
+                  lineHeight: 1.2,
+                  marginRight: 4,
+                  marginLeft: 0,
+                  display: 'inline-block',
+                }}>{note.category}</span>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <button
+                    aria-label={isEnlarged ? 'Shrink sticky note' : 'Enlarge sticky note'}
+                    onClick={e => {
+                      e.stopPropagation();
+                      setEnlargedNotes(prev => ({ ...prev, [idx]: !isEnlarged }));
+                    }}
+                    style={{
+                      background: isEnlarged ? '#ffd1dc' : '#b3e5fc',
+                      color: '#4d2600',
+                      border: '1.5px solid #f4a261',
+                      borderRadius: 8,
+                      fontWeight: 700,
+                      fontSize: 18,
+                      width: 32,
+                      height: 32,
+                      boxShadow: '0 2px 8px #f4a26122',
+                      cursor: 'pointer',
+                      outline: isEnlarged ? '2px solid #f4a261' : 'none',
+                      transition: 'all 0.18s',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: 0,
+                    }}
+                    title={isEnlarged ? 'Shrink note' : 'Enlarge note'}
+                  >{isEnlarged ? '−' : '+'}</button>
+                  <button
+                    aria-label="View milestones"
+                    onClick={e => {
+                      e.stopPropagation();
+                      setMilestoneModalIdx(idx);
+                    }}
+                    style={{
+                      background: '#fffbe8',
+                      color: '#4d2600',
+                      border: '1.5px solid #f4a261',
+                      borderRadius: 8,
+                      fontWeight: 700,
+                      fontSize: 18,
+                      width: 32,
+                      height: 32,
+                      boxShadow: '0 2px 8px #f4a26122',
+                      cursor: 'pointer',
+                      outline: 'none',
+                      transition: 'all 0.18s',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: 0,
+                    }}
+                    title="View milestones"
+                  >📋</button>
+                </div>
+              </div>
+              {/* Main note text */}
+              <div style={{
+                minHeight: 60,
+                color: fontColor,
+                textAlign: 'left',
+                width: '100%',
+                marginBottom: 8,
+                fontWeight: 500,
+                lineHeight: 1.25,
+                padding: isEnlarged ? '0 2px' : '0 1px',
+                background: 'rgba(255,255,255,0.08)',
+                borderRadius: 8,
+                boxShadow: isEnlarged ? '0 1px 8px #ffd1dc22' : '0 1px 4px #ffd1dc11',
+                overflow: 'auto', // allow scrolling if needed
+                textOverflow: 'unset',
+                whiteSpace: 'pre-line', // always allow wrapping
+                wordBreak: 'break-word',
+                maxHeight: isEnlarged ? 120 : 48, // limit height, but allow scroll
+              }}>{note.text}</div>
+              {/* Milestones Section (abbreviated) */}
+              <div style={{ marginTop: 4, marginBottom: 2 }}>
+                <ul style={{
+                  listStyle: 'none',
+                  padding: 0,
+                  margin: 0,
+                  maxWidth: '100%',
+                  overflow: 'hidden',
                   display: 'flex',
+                  flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  padding: 0,
-                }}
-                title="View milestones"
-              >📋</button>
-              <div style={{ minHeight: 60, whiteSpace: 'pre-line', color: fontColor, textAlign: 'center', width: '100%' }}>{note.text}</div>
-              <div style={{ position: 'absolute', bottom: 8, right: 8, fontSize: 13, color: fontColor === '#fff' ? '#fffbe8' : '#555', background: '#fffbe8cc', borderRadius: 4, padding: '2px 6px' }}>
-                {note.category}
+                  gap: isEnlarged ? 6 : 3,
+                }}>
+                  {(note.milestones || []).slice(0, isEnlarged ? 10 : 6).map((ms, msIdx) => (
+                    <li key={msIdx}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: isEnlarged ? '0.85em' : '0.55em',
+                        textDecoration: ms.checked ? 'line-through' : 'none',
+                        opacity: ms.checked ? 0.6 : 1,
+                        background: ms.checked ? '#e0e0e0' : 'rgba(255,255,255,0.18)',
+                        borderRadius: 6,
+                        padding: isEnlarged ? '4px 10px' : '2px 6px',
+                        margin: 0,
+                        width: '95%',
+                        minWidth: 0,
+                        maxWidth: '98%',
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap',
+                        textOverflow: 'ellipsis',
+                        boxShadow: '0 1px 4px #ffd1dc22',
+                        fontWeight: 500,
+                        cursor: 'pointer',
+                        transition: 'all 0.18s',
+                      }}
+                      onClick={e => {
+                        e.stopPropagation();
+                        setEnlargedMilestone({ noteIdx: idx, msIdx });
+                      }}
+                      title="Click to enlarge and view full milestone"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={!!ms.checked}
+                        onChange={ev => {
+                          ev.stopPropagation();
+                          const updated = [...(note.milestones || [])];
+                          updated[msIdx] = { ...updated[msIdx], checked: !updated[msIdx].checked };
+                          onUpdateNote(idx, { ...note, milestones: updated });
+                        }}
+                        style={{ marginRight: 8, width: isEnlarged ? 16 : 12, height: isEnlarged ? 16 : 12, flexShrink: 0 }}
+                        onClick={ev => ev.stopPropagation()}
+                      />
+                      <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0, textAlign: 'center' }}>{ms.text}</span>
+                    </li>
+                  ))}
+                  {(note.milestones || []).length > (isEnlarged ? 10 : 6) && (
+                    <li style={{ fontSize: isEnlarged ? '0.8em' : '0.5em', color: '#b35c00', textAlign: 'center', marginTop: 2 }}>
+                      …
+                    </li>
+                  )}
+                </ul>
               </div>
-              {/* Suggested Milestones Button (opens modal/panel) */}
+              {/* Suggest Milestones Button */}
               {(!note.milestones || note.milestones.length === 0) && !suggestions[idx] && (
                 <button
-                  style={{ fontSize: '0.7em', margin: '6px 0', background: '#b3e5fc', color: '#222', border: 'none', borderRadius: 4, padding: '2px 10px', cursor: 'pointer' }}
+                  style={{ fontSize: isEnlarged ? '1em' : '0.7em', margin: '6px 0', background: '#b3e5fc', color: '#222', border: 'none', borderRadius: 6, padding: isEnlarged ? '6px 18px' : '2px 10px', cursor: 'pointer', fontWeight: 600, boxShadow: '0 1px 4px #b3e5fc33' }}
                   disabled={loadingSuggestionIdx === idx}
                   onClick={async () => {
                     setLoadingSuggestionIdx(idx);
@@ -277,43 +448,6 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote }) => {
                   }}
                 >{loadingSuggestionIdx === idx ? 'Suggesting...' : '💡 Suggest Milestones'}</button>
               )}
-              {/* Milestones Section (abbreviated) */}
-              <div style={{ marginTop: 8 }}>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                  {(note.milestones || []).slice(0, 5).map((ms, msIdx) => (
-                    <li key={msIdx} style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      fontSize: '0.38em', // much smaller font for all states
-                      textDecoration: ms.checked ? 'line-through' : 'none',
-                      opacity: ms.checked ? 0.6 : 1,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      wordBreak: 'normal',
-                      marginBottom: 2, // tighter spacing
-                      maxWidth: isEnlarged ? 270 : 120, // fit within sticky note
-                    }}>
-                      <input
-                        type="checkbox"
-                        checked={!!ms.checked}
-                        onChange={() => {
-                          const updated = [...(note.milestones || [])];
-                          updated[msIdx] = { ...updated[msIdx], checked: !updated[msIdx].checked };
-                          onUpdateNote(idx, { ...note, milestones: updated });
-                        }}
-                        style={{ marginRight: 4, width: 10, height: 10 }}
-                      />
-                      <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>{ms.text}</span>
-                    </li>
-                  ))}
-                  {(note.milestones || []).length > 5 && (
-                    <li style={{ fontSize: '0.38em', color: '#b35c00', textAlign: 'center', marginTop: 2 }}>
-                      …
-                    </li>
-                  )}
-                </ul>
-              </div>
             </div>
           );
         })}
@@ -367,32 +501,41 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote }) => {
               border: '2.5px solid #ffd1dc',
               borderRadius: 16,
               boxShadow: '0 8px 32px #f4a26155',
-              minWidth: 320,
-              maxWidth: 420,
-              maxHeight: 420,
-              padding: 24,
+              minWidth: 380,
+              maxWidth: 600,
+              width: '90vw',
+              maxHeight: 540,
+              padding: 32,
               zIndex: 4100,
               position: 'relative',
-              fontSize: '1em',
+              fontSize: '1.08em',
               color: '#4d2600',
               overflowY: 'auto',
               display: 'flex',
               flexDirection: 'column',
+              alignItems: 'stretch',
+              boxSizing: 'border-box',
             }}
             onClick={e => e.stopPropagation()}
           >
-            <div style={{ fontWeight: 700, fontSize: '1.1em', marginBottom: 8, textAlign: 'center' }}>Milestones for this Goal</div>
+            <div id="milestone-modal-goal" style={{ fontWeight: 700, fontSize: '1.18em', marginBottom: 16, textAlign: 'center', background: '#ffd1dc22', borderRadius: 8, padding: 12 }}>
+              {notes[milestoneModalIdx].text}
+            </div>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               {(notes[milestoneModalIdx].milestones || []).map((ms, msIdx) => (
                 <li key={msIdx} style={{
                   display: 'flex',
                   alignItems: 'center',
-                  fontSize: '0.98em',
+                  fontSize: '1em',
                   textDecoration: ms.checked ? 'line-through' : 'none',
                   opacity: ms.checked ? 0.6 : 1,
                   whiteSpace: 'pre-line',
                   wordBreak: 'break-word',
-                  marginBottom: 6,
+                  marginBottom: 10,
+                  background: '#fff',
+                  borderRadius: 6,
+                  padding: '8px 12px',
+                  boxShadow: '0 1px 4px #ffd1dc33',
                 }}>
                   <input
                     type="checkbox"
@@ -402,16 +545,16 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote }) => {
                       updated[msIdx] = { ...updated[msIdx], checked: !updated[msIdx].checked };
                       onUpdateNote(milestoneModalIdx, { ...notes[milestoneModalIdx], milestones: updated });
                     }}
-                    style={{ marginRight: 8 }}
+                    style={{ marginRight: 12, width: 18, height: 18 }}
                   />
-                  <span style={{ flex: 1 }}>{ms.text}</span>
+                  <span style={{ flex: 1, fontSize: '1.08em', overflowWrap: 'anywhere' }}>{ms.text}</span>
                   <button
                     onClick={() => {
                       const updated = [...(notes[milestoneModalIdx].milestones || [])];
                       updated.splice(msIdx, 1);
                       onUpdateNote(milestoneModalIdx, { ...notes[milestoneModalIdx], milestones: updated });
                     }}
-                    style={{ marginLeft: 8, color: '#e76f51', background: 'none', border: 'none', cursor: 'pointer', fontSize: 16 }}
+                    style={{ marginLeft: 12, color: '#e76f51', background: 'none', border: 'none', cursor: 'pointer', fontSize: 20 }}
                     title="Delete milestone"
                   >✕</button>
                 </li>
@@ -428,20 +571,124 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote }) => {
                   input.value = '';
                 }
               }}
-              style={{ display: 'flex', marginTop: 12 }}
+              style={{ display: 'flex', marginTop: 18, gap: 12 }}
             >
               <input
                 name={`ms-input-modal`}
                 type="text"
                 placeholder="Add step/milestone..."
-                style={{ flex: 1, fontSize: '1em', borderRadius: 4, border: '1px solid #ccc', padding: '2px 6px' }}
+                style={{ flex: 1, fontSize: '1em', borderRadius: 4, border: '1px solid #ccc', padding: '8px 12px' }}
               />
-              <button type="submit" style={{ marginLeft: 8, fontSize: 16, background: '#b3e5fc', color: '#222', border: 'none', borderRadius: 4, padding: '2px 10px', cursor: 'pointer' }}>+</button>
+              <button type="submit" style={{ fontSize: 18, background: '#b3e5fc', color: '#222', border: 'none', borderRadius: 4, padding: '8px 22px', cursor: 'pointer' }}>+</button>
             </form>
             <button
               onClick={() => setMilestoneModalIdx(null)}
-              style={{ marginTop: 18, background: '#ffd1dc', color: '#4d2600', border: 'none', borderRadius: 6, fontWeight: 600, fontSize: '1em', padding: '6px 18px', cursor: 'pointer', alignSelf: 'center' }}
+              style={{ marginTop: 28, background: '#ffd1dc', color: '#4d2600', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: '1.08em', padding: '12px 36px', cursor: 'pointer', alignSelf: 'center', boxShadow: '0 2px 8px #ffd1dc33' }}
             >Close</button>
+          </div>
+        </div>
+      )}
+      {/* Enlarged Milestone Modal */}
+      {enlargedMilestone && notes[enlargedMilestone.noteIdx] && notes[enlargedMilestone.noteIdx].milestones && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.18)',
+          zIndex: 5000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+          onClick={() => setEnlargedMilestone(null)}
+        >
+          <div
+            style={{
+              background: '#fffbe8',
+              border: '2.5px solid #ffd1dc',
+              borderRadius: 16,
+              boxShadow: '0 8px 32px #f4a26155',
+              minWidth: 320,
+              maxWidth: 480,
+              width: '90vw',
+              maxHeight: 340,
+              padding: 32,
+              zIndex: 5100,
+              position: 'relative',
+              fontSize: '1.15em',
+              color: '#4d2600',
+              overflowY: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              boxSizing: 'border-box',
+              justifyContent: 'center',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ fontWeight: 700, fontSize: '1.18em', marginBottom: 18, textAlign: 'center', background: '#ffd1dc22', borderRadius: 8, padding: 14, width: '100%' }}>
+              {notes[enlargedMilestone.noteIdx].milestones[enlargedMilestone.msIdx].text}
+            </div>
+            <button
+              onClick={() => setEnlargedMilestone(null)}
+              style={{ marginTop: 12, background: '#ffd1dc', color: '#4d2600', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: '1.08em', padding: '10px 32px', cursor: 'pointer', alignSelf: 'center', boxShadow: '0 2px 8px #ffd1dc33' }}
+            >Close</button>
+          </div>
+        </div>
+      )}
+      {/* Congratulations Modal */}
+      {completedGoalIdx !== null && notes[completedGoalIdx] && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.22)',
+          zIndex: 6000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+          onClick={() => setCompletedGoalIdx(null)}
+        >
+          <div
+            style={{
+              background: '#fffbe8',
+              border: '3px solid #ffd1dc',
+              borderRadius: 22,
+              boxShadow: '0 8px 32px #f4a26155',
+              minWidth: 340,
+              maxWidth: 480,
+              width: '90vw',
+              padding: 36,
+              zIndex: 6100,
+              position: 'relative',
+              fontSize: '1.18em',
+              color: '#4d2600',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              textAlign: 'center',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ fontSize: 48, marginBottom: 10 }}>🏆</div>
+            <div style={{ fontWeight: 800, fontSize: '1.3em', marginBottom: 10 }}>Congratulations!</div>
+            <div style={{ marginBottom: 18 }}>You accomplished your goal:</div>
+            <div style={{ fontWeight: 700, fontSize: '1.1em', marginBottom: 18, color: '#44bba4' }}>
+              "{notes[completedGoalIdx].text}"
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14, width: '100%', marginBottom: 18 }}>
+              <button onClick={handleShareGoal} style={{ background: '#b3e5fc', color: '#222', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: '1.08em', padding: '10px 0', cursor: 'pointer', width: '100%' }}>Share Goal 🎉</button>
+              <button onClick={handleShareFacebook} style={{ background: '#4267B2', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: '1.08em', padding: '10px 0', cursor: 'pointer', width: '100%' }}>Share on Facebook</button>
+              <button onClick={handleReflectGoal} style={{ background: '#ffd1dc', color: '#4d2600', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: '1.08em', padding: '10px 0', cursor: 'pointer', width: '100%' }}>Reflect on Goal 📝</button>
+              <button onClick={handleMountShowroom} style={{ background: '#ffe082', color: '#b35c00', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: '1.08em', padding: '10px 0', cursor: 'pointer', width: '100%' }}>Mount to Complete Goal Showroom 🏅</button>
+              <button onClick={handleDeleteGoal} style={{ background: '#e76f51', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: '1.08em', padding: '10px 0', cursor: 'pointer', width: '100%' }}>Delete Goal 🗑️</button>
+            </div>
+            <button onClick={() => setCompletedGoalIdx(null)} style={{ marginTop: 8, background: '#fff', color: '#4d2600', border: '1.5px solid #ffd1dc', borderRadius: 8, fontWeight: 600, fontSize: '1em', padding: '8px 32px', cursor: 'pointer' }}>Close</button>
           </div>
         </div>
       )}

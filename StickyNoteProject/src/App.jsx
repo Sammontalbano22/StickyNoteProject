@@ -6,6 +6,8 @@ import Header from './components/header.jsx';
 import Auth from './components/auth.jsx';
 import StickyNotePad from './components/StickyNotePad.jsx';
 import GoalBoard from './components/GoalBoard.jsx';
+import GoalShowroom from './components/GoalShowroom';
+import WidgetBar from './components/WidgetBar';
 
 import { auth } from './js/firebase-init.js';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -16,6 +18,9 @@ function App() {
   const [animatedText, setAnimatedText] = useState("");
   const [stickyNotes, setStickyNotes] = useState([]);
   const [padCategories, setPadCategories] = useState();
+  const [showShowroom, setShowShowroom] = useState(false);
+  const [pinnedGoals, setPinnedGoals] = useState([]); // {text, color, category, completedAt}
+  const [completedGoals, setCompletedGoals] = useState([]); // {text, color, category, completedAt}
   const stickyMessage = "I am Accomplishing my Goals!";
 
   useEffect(() => {
@@ -62,6 +67,20 @@ function App() {
     }
   }, [stickyNotes, isLoggedIn]);
 
+  // Load showroom state from localStorage
+  useEffect(() => {
+    const pinned = JSON.parse(localStorage.getItem('showroom_pinnedGoals') || '[]');
+    const completed = JSON.parse(localStorage.getItem('showroom_completedGoals') || '[]');
+    setPinnedGoals(pinned);
+    setCompletedGoals(completed);
+  }, []);
+
+  // Persist showroom state to localStorage
+  useEffect(() => {
+    localStorage.setItem('showroom_pinnedGoals', JSON.stringify(pinnedGoals));
+    localStorage.setItem('showroom_completedGoals', JSON.stringify(completedGoals));
+  }, [pinnedGoals, completedGoals]);
+
   // Add a sticky note to the board
   const handleDropNote = (note) => {
     setStickyNotes((prev) => [...prev, note]);
@@ -93,9 +112,24 @@ function App() {
     });
   };
 
+  // When a goal is completed and mounted, add to pinnedGoals and remove from board
+  const handleMountShowroom = (goal) => {
+    setPinnedGoals(prev => [...prev, { ...goal, completedAt: Date.now() }]);
+    if (!completedGoals.find(g => g.text === goal.text)) {
+      setCompletedGoals(prev => [...prev, { ...goal, completedAt: Date.now() }]);
+    }
+    setStickyNotes(prev => prev.filter(g => g.text !== goal.text));
+  };
+  // Unpin from showroom
+  const handleUnpin = (idx) => {
+    setPinnedGoals(prev => prev.filter((_, i) => i !== idx));
+  };
+
   return (
     <>
-      {isLoggedIn && <Header />}
+      {/* Only show Header and WidgetBar if logged in and not showing welcome sticky */}
+      {isLoggedIn && !showWelcomeSticky && <Header onShowShowroom={() => setShowShowroom(true)} />}
+      {isLoggedIn && !showWelcomeSticky && <WidgetBar goals={[...stickyNotes, ...pinnedGoals]} />}
       <div className="App">
         {showWelcomeSticky && (
           <div style={{
@@ -133,7 +167,21 @@ function App() {
             </div>
             <div>
               <h2 style={{ fontFamily: 'Patrick Hand, Comic Sans MS, cursive', color: '#4d2600', marginBottom: 8 }}>Goal Board</h2>
-              <GoalBoard notes={stickyNotes} onDropNote={handleDropNote} onDeleteNote={handleDeleteNote} onUpdateNote={handleUpdateNote} />
+              <GoalBoard
+                notes={stickyNotes}
+                onDropNote={handleDropNote}
+                onDeleteNote={handleDeleteNote}
+                onUpdateNote={handleUpdateNote}
+                onMountShowroom={handleMountShowroom}
+              />
+            </div>
+          </div>
+        )}
+        {showShowroom && (
+          <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.18)', zIndex: 9998, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ background: '#fffbe8', border: '2.5px solid #ffd1dc', borderRadius: 18, boxShadow: '0 8px 32px #f4a26155', minWidth: 400, maxWidth: 1000, width: '90vw', maxHeight: '90vh', overflowY: 'auto', padding: 0, zIndex: 9999, position: 'relative' }}>
+              <button onClick={() => setShowShowroom(false)} style={{ position: 'absolute', top: 18, right: 18, background: '#ffd1dc', color: '#4d2600', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 18, padding: '8px 24px', cursor: 'pointer', zIndex: 10000 }}>Close</button>
+              <GoalShowroom pinnedGoals={pinnedGoals} completedGoals={completedGoals} onUnpin={handleUnpin} />
             </div>
           </div>
         )}
