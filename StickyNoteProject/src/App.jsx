@@ -15,6 +15,7 @@ function App() {
   const [showWelcomeSticky, setShowWelcomeSticky] = useState(false);
   const [animatedText, setAnimatedText] = useState("");
   const [stickyNotes, setStickyNotes] = useState([]);
+  const [padCategories, setPadCategories] = useState();
   const stickyMessage = "I am Accomplishing my Goals!";
 
   useEffect(() => {
@@ -47,6 +48,16 @@ function App() {
   // Add a sticky note to the board
   const handleDropNote = (note) => {
     setStickyNotes((prev) => [...prev, note]);
+  };
+
+  // Remove a sticky note by index
+  const handleDeleteNote = (idx) => {
+    setStickyNotes((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  // Update categories/colors for sticky notes
+  const handleUpdateCategories = (newCategories) => {
+    setPadCategories(newCategories);
   };
 
   return (
@@ -85,11 +96,11 @@ function App() {
           <div style={{ display: 'flex', flexDirection: 'row', gap: 32, marginTop: 24, justifyContent: 'center', alignItems: 'flex-start' }}>
             <div>
               <h2 style={{ fontFamily: 'Patrick Hand, Comic Sans MS, cursive', color: '#4d2600', marginBottom: 8 }}>Sticky Note Pad</h2>
-              <StickyNotePad onCreate={handleDropNote} />
+              <StickyNotePad onCreate={handleDropNote} padColors={padCategories} onUpdateCategories={handleUpdateCategories} />
             </div>
             <div>
               <h2 style={{ fontFamily: 'Patrick Hand, Comic Sans MS, cursive', color: '#4d2600', marginBottom: 8 }}>Goal Board</h2>
-              <GoalBoard notes={stickyNotes} onDropNote={handleDropNote} />
+              <GoalBoard notes={stickyNotes} onDropNote={handleDropNote} onDeleteNote={handleDeleteNote} />
             </div>
           </div>
         )}
