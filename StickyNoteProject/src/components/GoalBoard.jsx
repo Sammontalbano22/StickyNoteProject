@@ -192,39 +192,42 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote, onMountShowr
                   style={{ marginLeft: 4, background: '#ff8b94', color: '#222', border: 'none', borderRadius: 4, fontSize: '0.95em', cursor: 'pointer', padding: '2px 10px' }}
                   onClick={() => {
                     setSuggestions(s => ({ ...s, [activeSuggestionIdx]: s[activeSuggestionIdx].filter((_, i) => i !== sIdx) }));
-                  }}
-                  title="Reject suggestion"
-                >Reject</button>
+                    }}
+                    title="Reject suggestion"
+                  >Reject</button>
+                  </div>
+                ))}
+                {suggestions[activeSuggestionIdx].length === 0 && <div style={{ color: '#888', fontStyle: 'italic' }}>No more suggestions</div>}
+                <button
+                  style={{ marginTop: 12, background: '#ffd1dc', color: '#4d2600', border: 'none', borderRadius: 6, fontWeight: 600, fontSize: '1em', padding: '6px 18px', cursor: 'pointer' }}
+                  onClick={() => setActiveSuggestionIdx(null)}
+                >Close</button>
+                </div>
               </div>
-            ))}
-            {suggestions[activeSuggestionIdx].length === 0 && <div style={{ color: '#888', fontStyle: 'italic' }}>No more suggestions</div>}
-            <button
-              style={{ marginTop: 12, background: '#ffd1dc', color: '#4d2600', border: 'none', borderRadius: 6, fontWeight: 600, fontSize: '1em', padding: '6px 18px', cursor: 'pointer' }}
-              onClick={() => setActiveSuggestionIdx(null)}
-            >Close</button>
-          </div>
-        </div>
-      )}
-      <div
-        id="sticky-board"
-        style={{
-          border: dragOver ? '3px dashed #f4a261' : undefined,
-          minHeight: 320,
-          minWidth: 340,
-          background: dragOver ? '#fffbe8' : undefined,
-          transition: 'background 0.2s, border 0.2s',
-          flex: 1,
-        }}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-      >
-        {notes.length === 0 && (
-          <div style={{ color: '#aaa', fontStyle: 'italic', textAlign: 'center', marginTop: 40 }}>
-            Drag a sticky note here to add it to your goal board!
-          </div>
-        )}
-        {notes.map((note, idx) => {
+              )}
+              <div
+              id="sticky-board"
+              style={{
+                border: dragOver ? '3px dashed #f4a261' : undefined,
+                minHeight: 320,
+                minWidth: 340,
+                background: dragOver ? '#fffbe8' : undefined,
+                transition: 'background 0.2s, border 0.2s',
+                flex: 1,
+              }}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              >
+              <div style={{ textAlign: 'center', margin: '18px 0 10px 0' }}>
+                <h2 style={{ color: '#b35c00', fontWeight: 800, letterSpacing: 0.5, margin: 0 }}>Goal Board</h2>
+              </div>
+              {notes.length === 0 && (
+                <div style={{ color: '#aaa', fontStyle: 'italic', textAlign: 'center', marginTop: 40 }}>
+                Drag a sticky note here to add it to your goal board!
+                </div>
+              )}
+              {notes.map((note, idx) => {
           // Utility: get contrast color (black or white) for note background
           function getContrastYIQ(hex) {
             let c = hex.replace('#', '');

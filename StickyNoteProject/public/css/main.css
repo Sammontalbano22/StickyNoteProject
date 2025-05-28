@@ -61,57 +61,49 @@ h1 {
 }
 
 /* Layout */
+#app-content > main {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2em;
+}
+
 main {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2em;
   padding: 2em;
-  background: #e0cda9;
-  min-height: 100vh;
+  background: none !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
 section {
-  background: #fffdf4;
-  padding: 1.5em;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  background: none !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
-textarea,
-input {
-  width: 100%;
-  padding: 0.5em;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  margin-top: 0.5em;
-  font-size: 1rem;
-}
-
-button {
-  margin-top: 0.5em;
-  padding: 0.6em 1.2em;
-  border: none;
-  background: #f4a261;
-  color: white;
-  font-weight: bold;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #e76f51;
-}
-
-/* Sticky Board Styling */
 #sticky-board {
   display: flex;
   flex-wrap: wrap;
   gap: 1em;
-  padding: 1em;
-  background-image: url('https://www.transparenttextures.com/patterns/cork-board.png');
-  border-radius: 10px;
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
-  min-height: 300px;
+  padding: 2em 1.5em;
+  min-height: 340px;
+  min-width: 340px;
+  background: url('https://www.transparenttextures.com/patterns/cork-board.png'), #e0cda9;
+  background-size: cover;
+  border-radius: 18px;
+  border: 4px solid #bfa76a;
+  box-shadow: 0 8px 32px #bfa76a33, 0 2px 0 #fffbe8 inset;
+  position: relative;
+  z-index: 1;
+}
+
+/* Ensure sticky note pad is left of goal board */
+.note-pad {
+  order: 0;
 }
 
 /* Realistic Sticky Note */
@@ -126,6 +118,8 @@ button:hover {
   font-family: 'Comic Sans MS', cursive, sans-serif;
   position: relative;
   transition: transform 0.3s;
+  /* Pin effect */
+  box-shadow: 0 4px 18px #bfa76a33, 0 2px 0 #fffbe8 inset, 0 0.5px 0 #bdbdbd inset;
 }
 
 .sticky-note:hover {
@@ -135,6 +129,21 @@ button:hover {
 
 .sticky-note::before {
   display: none !important;
+}
+
+.sticky-note::after {
+  /* Pin thumbtack */
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 16px;
+  background: radial-gradient(circle at 60% 40%, #e76f51 70%, #b35c00 100%);
+  border-radius: 50%;
+  box-shadow: 0 2px 6px #b35c0033;
+  z-index: 2;
 }
 
 /* Enlarged Sticky Note */
@@ -186,12 +195,9 @@ button:hover {
 /* Sticky note pad input style */
 .note-pad {
   position: relative;
-  background: #fff68f;
-  width: 180px;
-  height: 180px;
-  padding: 1em;
-  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2);
-  border-radius: 5px;
+  background: none !important;
+  box-shadow: none !important;
+  border: none !important;
   font-family: 'Patrick Hand', 'Comic Sans MS', cursive, sans-serif;
   margin-bottom: 0.5em;
   overflow: hidden;
@@ -644,4 +650,25 @@ button:hover {
 @keyframes blink-cursor {
   0%, 100% { border-color: #f4a261; }
   50% { border-color: transparent; }
+}
+
+.note-pad-container {
+  background: linear-gradient(120deg, #fffbe8 80%, #ffe082 100%);
+  border-radius: 18px;
+  box-shadow: 0 4px 18px #ffd1dc33, 0 2px 0 #fffbe8 inset;
+  border: 2.5px dashed #f4a261;
+  padding: 2em 1.5em 1.5em 1.5em;
+  margin-right: 2em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 220px;
+  max-width: 320px;
+}
+
+/* Remove background from .note-pad so the container shows through */
+.note-pad {
+  background: none !important;
+  box-shadow: none !important;
+  border: none !important;
 }

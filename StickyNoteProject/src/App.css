@@ -229,7 +229,7 @@ header h2 {
   /* Let the gradient show */
 }
 
-.main-content-grid {
+/* .main-content-grid {
   display: flex;
   flex-direction: row;
   gap: 40px;
@@ -239,11 +239,11 @@ header h2 {
   padding: 2.5em 1.5em 3em 1.5em;
   box-sizing: border-box;
   border-radius: 32px;
-  background: var(--glass-bg);
-  box-shadow: 0 12px 48px #ffd1dc33, 0 2px 0 #fffbe8 inset;
-  backdrop-filter: var(--glass-blur);
-  border: 2.5px dashed var(--sticky-orange);
-}
+  /* background: var(--glass-bg); */
+  /* box-shadow: 0 12px 48px #ffd1dc33, 0 2px 0 #fffbe8 inset; */
+  /* backdrop-filter: var(--glass-blur); */
+  /* border: 2.5px dashed var(--sticky-orange);
+} */ */
 
 .sidebar {
   width: 340px;
@@ -277,6 +277,7 @@ header h2 {
   background: linear-gradient(90deg, var(--sticky-yellow) 80%, var(--sticky-pink) 100%);
   border: 2.5px solid var(--sticky-pink);
   border-radius: 16px 18px 14px 20px/20px 14px 18px 16px;
+  font-family: 'Patrick Hand', cursive;
   font-size: 1.18em;
   color: var(--sticky-brown);
   font-weight: 900;
@@ -301,17 +302,9 @@ header h2 {
   gap: 40px;
 }
 .section-card {
-  background: linear-gradient(120deg, #fffbe8 80%, #ffe082 100%);
-  border-radius: 22px 18px 16px 20px/20px 16px 18px 22px;
-  box-shadow: 0 8px 32px #f4a26133, 0 2px 0 #fffbe8 inset;
-  border: 2.5px dashed var(--sticky-orange);
-  padding: 2.5em 2.2em 2em 2.2em;
-  margin-bottom: 1.2em;
-  min-width: 320px;
-  max-width: 800px;
-  position: relative;
-  transition: box-shadow 0.18s, border 0.18s, background 0.18s;
-  overflow: visible;
+  background: none !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 .section-card:before {
   content: '';
