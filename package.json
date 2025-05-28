@@ -6,7 +6,8 @@
     "express": "^5.1.0",
     "firebase": "^11.8.0",
     "firebase-admin": "^13.4.0",
-    "openai": "^4.98.0",
+    "node-fetch": "^3.3.2",
+    "openai": "^4.103.0",
     "path": "^0.12.7"
   }
 }

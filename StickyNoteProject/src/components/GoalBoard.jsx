@@ -1,5 +1,20 @@
 import React, { useState } from 'react';
 
+// Use backend proxy for AI suggestions
+async function getSuggestedMilestones(goalText) {
+  try {
+    const response = await fetch('/api/ai-suggest-milestones', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ goal: goalText })
+    });
+    const data = await response.json();
+    return data.suggestions || ['(No suggestions found)'];
+  } catch (e) {
+    return ['(Error fetching suggestions)'];
+  }
+}
+
 const padColors = [
   { color: '#ffe082', label: 'Personal' },
   { color: '#ffd1dc', label: 'Academic' },
@@ -23,6 +38,9 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote }) => {
   const [dragOver, setDragOver] = useState(false);
   const [draggedIdx, setDraggedIdx] = useState(null);
   const [trashOver, setTrashOver] = useState(false);
+  const [suggestions, setSuggestions] = useState({}); // {idx: [suggestion, ...]}
+  const [loadingSuggestionIdx, setLoadingSuggestionIdx] = useState(null);
+  const [activeSuggestionIdx, setActiveSuggestionIdx] = useState(null); // For showing suggestions outside sticky note
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -57,7 +75,69 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote }) => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 32 }}>
+    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 32, position: 'relative' }}>
+      {/* AI Suggestions Modal/Panel */}
+      {activeSuggestionIdx !== null && suggestions[activeSuggestionIdx] && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.18)',
+          zIndex: 3000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+          onClick={() => setActiveSuggestionIdx(null)}
+        >
+          <div style={{
+            background: '#fffbe8',
+            border: '2.5px solid #ffd1dc',
+            borderRadius: 16,
+            boxShadow: '0 8px 32px #f4a26155',
+            minWidth: 320,
+            maxWidth: 420,
+            padding: 24,
+            zIndex: 3100,
+            position: 'relative',
+            fontSize: '1em',
+            color: '#4d2600',
+          }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ fontWeight: 700, fontSize: '1.1em', marginBottom: 8 }}>AI Milestone Suggestions</div>
+            {suggestions[activeSuggestionIdx].map((sugg, sIdx) => (
+              <div key={sIdx} style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
+                <span style={{ flex: 1, wordBreak: 'break-word' }}>{sugg}</span>
+                <button
+                  style={{ marginLeft: 8, background: '#a8e6cf', color: '#222', border: 'none', borderRadius: 4, fontSize: '0.95em', cursor: 'pointer', padding: '2px 10px' }}
+                  onClick={() => {
+                    const note = notes[activeSuggestionIdx];
+                    const newMilestones = [...(note.milestones || []), { text: sugg, checked: false }];
+                    onUpdateNote(activeSuggestionIdx, { ...note, milestones: newMilestones });
+                    setSuggestions(s => ({ ...s, [activeSuggestionIdx]: s[activeSuggestionIdx].filter((_, i) => i !== sIdx) }));
+                  }}
+                  title="Accept suggestion"
+                >Accept</button>
+                <button
+                  style={{ marginLeft: 4, background: '#ff8b94', color: '#222', border: 'none', borderRadius: 4, fontSize: '0.95em', cursor: 'pointer', padding: '2px 10px' }}
+                  onClick={() => {
+                    setSuggestions(s => ({ ...s, [activeSuggestionIdx]: s[activeSuggestionIdx].filter((_, i) => i !== sIdx) }));
+                  }}
+                  title="Reject suggestion"
+                >Reject</button>
+              </div>
+            ))}
+            {suggestions[activeSuggestionIdx].length === 0 && <div style={{ color: '#888', fontStyle: 'italic' }}>No more suggestions</div>}
+            <button
+              style={{ marginTop: 12, background: '#ffd1dc', color: '#4d2600', border: 'none', borderRadius: 6, fontWeight: 600, fontSize: '1em', padding: '6px 18px', cursor: 'pointer' }}
+              onClick={() => setActiveSuggestionIdx(null)}
+            >Close</button>
+          </div>
+        </div>
+      )}
       <div
         id="sticky-board"
         style={{
@@ -119,7 +199,21 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote }) => {
               <div style={{ position: 'absolute', bottom: 8, right: 8, fontSize: 13, color: fontColor === '#fff' ? '#fffbe8' : '#555', background: '#fffbe8cc', borderRadius: 4, padding: '2px 6px' }}>
                 {note.category}
               </div>
-              {/* Milestones Section */}
+              {/* Suggested Milestones Button (opens modal/panel) */}
+              {(!note.milestones || note.milestones.length === 0) && !suggestions[idx] && (
+                <button
+                  style={{ fontSize: '0.7em', margin: '6px 0', background: '#b3e5fc', color: '#222', border: 'none', borderRadius: 4, padding: '2px 10px', cursor: 'pointer' }}
+                  disabled={loadingSuggestionIdx === idx}
+                  onClick={async () => {
+                    setLoadingSuggestionIdx(idx);
+                    const sugg = await getSuggestedMilestones(note.text);
+                    setSuggestions(s => ({ ...s, [idx]: sugg }));
+                    setLoadingSuggestionIdx(null);
+                    setActiveSuggestionIdx(idx);
+                  }}
+                >{loadingSuggestionIdx === idx ? 'Suggesting...' : '💡 Suggest Milestones'}</button>
+              )}
+              {/* Milestones Section (abbreviated) */}
               <div style={{ marginTop: 8 }}>
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                   {(note.milestones || []).map((ms, msIdx) => (

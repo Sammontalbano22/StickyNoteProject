@@ -260,6 +260,30 @@ Break this goal down into 3–5 small, actionable short-term steps they can star
   }
 });
 
+// ─── AI Milestone Suggestion Route ─────────────────────────────
+app.post('/api/ai-suggest-milestones', async (req, res) => {
+  const { goal } = req.body;
+  if (!goal) return res.status(400).json({ error: 'Missing goal' });
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        { role: 'system', content: 'You are an assistant that helps break down goals into actionable short-term milestones.' },
+        { role: 'user', content: `Suggest 3-5 short-term, actionable milestones for the following goal. Respond with a plain list, no explanations.\nGoal: ${goal}` }
+      ],
+      max_tokens: 120,
+      temperature: 0.6
+    });
+    const content = completion.choices[0].message.content;
+    const suggestions = content
+      .split(/\n|\r/)
+      .map(line => line.replace(/^[-*\d.\s]+/, '').trim())
+      .filter(line => line.length > 0);
+    return res.json({ suggestions });
+  } catch (e) {
+    return res.json({ suggestions: ['(Error fetching suggestions)'] });
+  }
+});
 
 // ─── Serve Static Frontend ──────────────────────
 app.use(express.static(path.join(__dirname)));
