@@ -4,6 +4,8 @@ import '/public/css/main.css';
 
 import Header from './components/header.jsx';
 import Auth from './components/auth.jsx';
+import StickyNotePad from './components/StickyNotePad.jsx';
+import GoalBoard from './components/GoalBoard.jsx';
 
 import { auth } from './js/firebase-init.js';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -12,6 +14,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showWelcomeSticky, setShowWelcomeSticky] = useState(false);
   const [animatedText, setAnimatedText] = useState("");
+  const [stickyNotes, setStickyNotes] = useState([]);
   const stickyMessage = "I am Accomplishing my Goals!";
 
   useEffect(() => {
@@ -40,6 +43,11 @@ function App() {
     });
     return () => unsubscribe();
   }, []);
+
+  // Add a sticky note to the board
+  const handleDropNote = (note) => {
+    setStickyNotes((prev) => [...prev, note]);
+  };
 
   return (
     <>
@@ -73,6 +81,18 @@ function App() {
         )}
         {!isLoggedIn && !showWelcomeSticky && <Auth />}
         {/* Main app content goes here for logged-in users */}
+        {isLoggedIn && !showWelcomeSticky && (
+          <div style={{ display: 'flex', flexDirection: 'row', gap: 32, marginTop: 24, justifyContent: 'center', alignItems: 'flex-start' }}>
+            <div>
+              <h2 style={{ fontFamily: 'Patrick Hand, Comic Sans MS, cursive', color: '#4d2600', marginBottom: 8 }}>Sticky Note Pad</h2>
+              <StickyNotePad onCreate={handleDropNote} />
+            </div>
+            <div>
+              <h2 style={{ fontFamily: 'Patrick Hand, Comic Sans MS, cursive', color: '#4d2600', marginBottom: 8 }}>Goal Board</h2>
+              <GoalBoard notes={stickyNotes} onDropNote={handleDropNote} />
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
