@@ -9,7 +9,8 @@ import GoalBoard from './components/GoalBoard.jsx';
 import GoalShowroom from './components/GoalShowroom';
 import WidgetBar from './components/WidgetBar';
 import VirtualCounselor from './components/VirtualCounselor.jsx';
-import counselorImg from './assets/counselor.png'; // You need to add a sharp-looking image to src/assets/counselor.png
+import CounselorDrawing from './components/CounselorDrawing.jsx';
+import { API } from './js/api.js';
 
 import { auth } from './js/firebase-init.js';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -24,6 +25,7 @@ function App() {
   const [pinnedGoals, setPinnedGoals] = useState([]); // {text, color, category, completedAt}
   const [completedGoals, setCompletedGoals] = useState([]); // {text, color, category, completedAt}
   const [showCounselor, setShowCounselor] = useState(false);
+  const [showWidgetBar, setShowWidgetBar] = useState(false);
   const stickyMessage = "I am Accomplishing my Goals!";
 
   useEffect(() => {
@@ -84,8 +86,16 @@ function App() {
     localStorage.setItem('showroom_completedGoals', JSON.stringify(completedGoals));
   }, [pinnedGoals, completedGoals]);
 
+  // Get coach persona from localStorage
+  const [coachPersona, setCoachPersona] = useState(() => localStorage.getItem('coach_persona') || 'cheerleader');
+  useEffect(() => {
+    const handleStorage = () => setCoachPersona(localStorage.getItem('coach_persona') || 'cheerleader');
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
+
   // Add a sticky note to the board
-  const handleDropNote = (note) => {
+   const handleDropNote = (note) => {
     setStickyNotes((prev) => [...prev, note]);
   };
 
@@ -128,147 +138,169 @@ function App() {
     setPinnedGoals(prev => prev.filter((_, i) => i !== idx));
   };
 
+  // Handler for VirtualCounselor to create a new goal
+  const handleCounselorCreateGoal = async (goalText) => {
+    // Add to stickyNotes and persist
+    const newGoal = {
+      text: goalText,
+      colorIdx: 0,
+      category: padCategories?.[0]?.label || 'Personal',
+      color: padCategories?.[0]?.color || '#ffe082',
+      milestones: [],
+    };
+    setStickyNotes(prev => [...prev, newGoal]);
+    // Optionally, call API.saveGoal(goalText) if backend needed
+    try { await API.saveGoal(goalText); } catch {}
+  };
+
+  // Handler for VirtualCounselor to add a milestone to a goal
+  const handleCounselorAddMilestone = (goalIdx, milestoneText) => {
+    setStickyNotes(prev => {
+      const updated = [...prev];
+      if (!updated[goalIdx].milestones) updated[goalIdx].milestones = [];
+      updated[goalIdx].milestones.push({ text: milestoneText, checked: false });
+      return updated;
+    });
+    // Optionally, call API.addMilestone if backend needed
+    const goal = stickyNotes[goalIdx];
+    if (goal && goal.id) {
+      try { API.addMilestone(goal.id, milestoneText); } catch {}
+    }
+  };
+
+  // Pin/unpin goals
+  const handleCounselorPinGoal = (goalIdx) => {
+    const goal = stickyNotes[goalIdx];
+    if (goal) handleMountShowroom(goal);
+  };
+  const handleCounselorUnpinGoal = (goalText) => {
+    setPinnedGoals(prev => prev.filter(g => g.text !== goalText));
+  };
+
+  // Show pinned/completed goals
+  const handleCounselorShowPinned = () => setShowShowroom(true);
+  const handleCounselorShowCompleted = () => setShowShowroom(true);
+
+  // WidgetBar features
+  const [widgetBarRef, setWidgetBarRef] = useState();
+  const handleCounselorAddWidget = (widget) => {
+    if (widgetBarRef && widgetBarRef.addWidget) widgetBarRef.addWidget(widget);
+  };
+  const handleCounselorListWidgets = () => {
+    if (widgetBarRef && widgetBarRef.getWidgets) return widgetBarRef.getWidgets();
+    return [];
+  };
+  const handleCounselorDeleteWidget = (idx) => {
+    if (widgetBarRef && widgetBarRef.removeWidget) widgetBarRef.removeWidget(idx);
+  };
+
+  // Habit Tracker
+  const handleCounselorOpenHabitTracker = () => setShowWidgetBar(true);
+
+  // Journal
+  const handleCounselorOpenJournal = () => {
+    // Could set a state to open journal modal if implemented
+  };
+  const handleCounselorAddJournalEntry = (entry) => {
+    // Could call API.addEntry or update state
+  };
+
+  // Motivational quote
+  const handleCounselorAddQuoteWidget = (quote) => handleCounselorAddWidget({ type: 'quote', content: quote, goal: '' });
+
+  // Playlist/image widget
+  const handleCounselorAddPlaylistWidget = (url) => handleCounselorAddWidget({ type: 'playlist', content: url, goal: '' });
+  const handleCounselorAddImageWidget = (url) => handleCounselorAddWidget({ type: 'image', content: url, goal: '' });
+
+  // Progress summary
+  const handleCounselorShowProgress = () => {
+    return {
+      totalGoals: stickyNotes.length + pinnedGoals.length,
+      completedGoals: completedGoals.length,
+      pinnedGoals: pinnedGoals.length,
+      totalMilestones: stickyNotes.reduce((sum, g) => sum + (g.milestones?.length || 0), 0),
+    };
+  };
+
   return (
     <>
       {/* Only show Header and WidgetBar if logged in and not showing welcome sticky */}
       {isLoggedIn && !showWelcomeSticky && <Header onShowShowroom={() => setShowShowroom(true)} />}
-      {isLoggedIn && !showWelcomeSticky && <WidgetBar goals={[...stickyNotes, ...pinnedGoals]} />}
-      <div className="App">
+      <div className="App main-layout">
         {showWelcomeSticky && (
-          <div style={{
-            position: 'fixed',
-            top: 0, left: 0, width: '100vw', height: '100vh',
-            background: 'rgba(0,0,0,0.18)',
-            zIndex: 2000,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <div style={{
-              background: '#ffe082',
-              border: '2.5px dashed #f4a261',
-              borderRadius: '18px 14px 16px 12px/12px 16px 14px 18px',
-              boxShadow: '0 8px 32px #f4a26155, 0 2px 0 #fffbe8 inset',
-              width: 320, height: 320,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontFamily: 'Patrick Hand, Comic Sans MS, cursive, sans-serif',
-              fontWeight: 900, fontSize: '1.5em', color: '#4d2600',
-              textAlign: 'center',
-              animation: 'pop-in 0.5s cubic-bezier(.4,2,.6,.9)',
-              whiteSpace: 'pre-line',
-            }}>
-              {animatedText}
-            </div>
+          <div className="welcome-sticky-modal">
+            <div className="welcome-sticky-text">{animatedText}</div>
             <style>{`@keyframes pop-in {0%{transform:scale(0.7) rotate(-6deg);opacity:0;} 60%{transform:scale(1.08) rotate(2deg);opacity:1;} 100%{transform:scale(1) rotate(0deg);opacity:1;}}`}</style>
           </div>
         )}
         {!isLoggedIn && !showWelcomeSticky && <Auth />}
-        {/* Main app content goes here for logged-in users */}
         {isLoggedIn && !showWelcomeSticky && (
-          <div style={{ display: 'flex', flexDirection: 'row', gap: 32, marginTop: 24, justifyContent: 'center', alignItems: 'flex-start' }}>
-            <div>
-              <h2 style={{ fontFamily: 'Patrick Hand, Comic Sans MS, cursive', color: '#4d2600', marginBottom: 8 }}>Sticky Note Pad</h2>
-              <StickyNotePad onCreate={handleDropNote} padColors={padCategories} onUpdateCategories={handleUpdateCategories} />
-              {/* Virtual Life Counselor Widget */}
-              {/* <div style={{ marginTop: 32 }}>
-                <VirtualCounselor />
-              </div> */}
-            </div>
-            <div>
-              <h2 style={{ fontFamily: 'Patrick Hand, Comic Sans MS, cursive', color: '#4d2600', marginBottom: 8 }}>Goal Board</h2>
-              <GoalBoard
-                notes={stickyNotes}
-                onDropNote={handleDropNote}
-                onDeleteNote={handleDeleteNote}
-                onUpdateNote={handleUpdateNote}
-                onMountShowroom={handleMountShowroom}
-              />
-            </div>
+          <div className="main-content-grid">
+            <aside className="sidebar">
+              <div className="sidebar-section">
+                <WidgetBar goals={[...stickyNotes, ...pinnedGoals]} />
+              </div>
+              <div className="sidebar-section">
+                <button className="counselor-btn" onClick={() => setShowCounselor(show => !show)}>
+                  <CounselorDrawing size={36} />
+                  <span>Virtual Counselor</span>
+                </button>
+              </div>
+            </aside>
+            <main className="main-sections">
+              <section className="section-card">
+                <h2>Sticky Note Pad</h2>
+                <StickyNotePad onCreate={handleDropNote} padColors={padCategories} onUpdateCategories={handleUpdateCategories} />
+              </section>
+              <section className="section-card">
+                <h2>Goal Board</h2>
+                <GoalBoard
+                  notes={stickyNotes}
+                  onDropNote={handleDropNote}
+                  onDeleteNote={handleDeleteNote}
+                  onUpdateNote={handleUpdateNote}
+                  onMountShowroom={handleMountShowroom}
+                />
+              </section>
+            </main>
           </div>
         )}
         {showShowroom && (
-          <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.18)', zIndex: 9998, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ background: '#fffbe8', border: '2.5px solid #ffd1dc', borderRadius: 18, boxShadow: '0 8px 32px #f4a26155', minWidth: 400, maxWidth: 1000, width: '90vw', maxHeight: '90vh', overflowY: 'auto', padding: 0, zIndex: 9999, position: 'relative' }}>
-              <button onClick={() => setShowShowroom(false)} style={{ position: 'absolute', top: 18, right: 18, background: '#ffd1dc', color: '#4d2600', border: 'none', borderRadius: 8, fontWeight: 600, fontSize: 18, padding: '8px 24px', cursor: 'pointer', zIndex: 10000 }}>Close</button>
+          <div className="modal-overlay">
+            <div className="modal-card">
+              <button className="close-btn" onClick={() => setShowShowroom(false)}>Close</button>
               <GoalShowroom pinnedGoals={pinnedGoals} completedGoals={completedGoals} onUnpin={handleUnpin} />
             </div>
           </div>
         )}
-        {isLoggedIn && !showWelcomeSticky && (
-          <button
-            onClick={() => setShowCounselor(true)}
-            style={{
-              position: 'fixed',
-              bottom: 32,
-              right: 32,
-              zIndex: 3000,
-              background: 'linear-gradient(135deg, #ffd1dc 60%, #b3e5fc 100%)',
-              border: '3px solid #ffd54f',
-              borderRadius: 18,
-              padding: '10px 28px 10px 18px',
-              boxShadow: '0 4px 24px #ffd1dc55, 0 2px 0 #fffbe8 inset',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 14,
-              fontFamily: 'Patrick Hand, Comic Sans MS, cursive, sans-serif',
-              fontWeight: 700,
-              fontSize: 20,
-              color: '#283593',
-              cursor: 'pointer',
-              transition: 'box-shadow 0.2s, transform 0.2s',
-            }}
-            aria-label="Open Virtual Counselor"
-            onMouseOver={e => (e.currentTarget.style.boxShadow = '0 8px 32px #1976d2aa')}
-            onMouseOut={e => (e.currentTarget.style.boxShadow = '0 4px 24px #ffd1dc55, 0 2px 0 #fffbe8 inset')}
-          >
-            <img
-              src={counselorImg}
-              alt="Virtual Counselor"
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: '50%',
-                border: '2.5px solid #ffd54f',
-                boxShadow: '0 2px 8px #f4a26188',
-                background: '#fffbe8',
-                objectFit: 'cover',
-                marginRight: 8,
-                transition: 'box-shadow 0.2s, transform 0.2s',
-              }}
-            />
-            <span style={{ fontWeight: 900, fontSize: 22, color: '#b35c00', letterSpacing: 0.2 }}>Virtual Counselor</span>
-          </button>
-        )}
         {showCounselor && (
-          <div style={{
-            position: 'fixed',
-            bottom: 110,
-            right: 40,
-            zIndex: 4000,
-            background: 'none',
-          }}>
-            <div style={{
-              position: 'relative',
-              background: 'none',
-            }}>
-              <button
-                onClick={() => setShowCounselor(false)}
-                style={{
-                  position: 'absolute',
-                  top: -18,
-                  right: -18,
-                  background: '#ffd1dc',
-                  color: '#4d2600',
-                  border: 'none',
-                  borderRadius: '50%',
-                  width: 32,
-                  height: 32,
-                  fontWeight: 700,
-                  fontSize: 18,
-                  cursor: 'pointer',
-                  boxShadow: '0 2px 8px #0002',
-                }}
-                aria-label="Close Counselor"
-              >×</button>
-              <VirtualCounselor />
+          <div className="modal-overlay counselor-modal">
+            <div className="modal-card">
+              <button className="close-btn" onClick={() => setShowCounselor(false)}>×</button>
+              <VirtualCounselor
+                onCreateGoal={handleCounselorCreateGoal}
+                onAddMilestone={handleCounselorAddMilestone}
+                onPinGoal={handleCounselorPinGoal}
+                onUnpinGoal={handleCounselorUnpinGoal}
+                onShowPinned={handleCounselorShowPinned}
+                onShowCompleted={handleCounselorShowCompleted}
+                onAddWidget={handleCounselorAddWidget}
+                onListWidgets={handleCounselorListWidgets}
+                onDeleteWidget={handleCounselorDeleteWidget}
+                onOpenHabitTracker={handleCounselorOpenHabitTracker}
+                onShowProgress={handleCounselorShowProgress}
+                onOpenShowroom={handleCounselorShowPinned}
+                onOpenJournal={handleCounselorOpenJournal}
+                onAddJournalEntry={handleCounselorAddJournalEntry}
+                onAddQuoteWidget={handleCounselorAddQuoteWidget}
+                onAddPlaylistWidget={handleCounselorAddPlaylistWidget}
+                onAddImageWidget={handleCounselorAddImageWidget}
+                goals={stickyNotes}
+                pinnedGoals={pinnedGoals}
+                completedGoals={completedGoals}
+                getProgress={handleCounselorShowProgress}
+                coachPersona={coachPersona}
+              />
             </div>
           </div>
         )}

@@ -14,6 +14,14 @@ const SPOTIFY_HEIGHT = 80;
 const WIDGET_WIDTH = SPOTIFY_WIDTH;
 const WIDGET_HEIGHT = SPOTIFY_HEIGHT;
 
+// Persona options
+const COACH_PERSONAS = [
+  { value: 'cheerleader', label: 'Cheerleader' },
+  { value: 'accountability', label: 'Accountability Partner' },
+  { value: 'gentle', label: 'Gentle Guide' },
+  { value: 'custom', label: 'Custom' },
+];
+
 // WidgetsArea: standalone area for displaying widgets above the sticky note goals
 const WidgetsArea = ({ widgets, onRemove, onMove, onDragStart, onDragOver, onDrop, draggingIdx }) => (
   <div style={{
@@ -261,10 +269,16 @@ const App = () => {
   const [adding, setAdding] = useState(false);
   const [newWidget, setNewWidget] = useState({ type: 'quote', content: '', goal: '' });
   const [draggingIdx, setDraggingIdx] = useState(null);
+  const [coachPersona, setCoachPersona] = useState(() => {
+    return localStorage.getItem('coach_persona') || 'cheerleader';
+  });
 
   useEffect(() => {
     localStorage.setItem('widgetBar_widgets', JSON.stringify(widgets));
   }, [widgets]);
+  useEffect(() => {
+    localStorage.setItem('coach_persona', coachPersona);
+  }, [coachPersona]);
 
   const handleAddWidget = () => {
     // For habit tracker, allow empty content
@@ -308,20 +322,22 @@ const App = () => {
         onClick={() => setAdding(true)}
         style={{
           position: 'fixed',
-          bottom: 32,
-          right: 48,
+          left: 0,
+          bottom: 110, // match Virtual Counselor's bottom: 110
+          top: 'auto',
+          transform: 'none',
           background: 'linear-gradient(90deg, #ffe082 80%, #ffd1dc 100%)',
           color: '#b35c00',
           border: '2.5px solid #ffd1dc',
-          borderRadius: 18,
+          borderRadius: '0 18px 18px 0',
           fontWeight: 900,
           fontSize: 22,
-          padding: '16px 38px',
+          padding: '16px 38px 16px 24px',
           cursor: 'pointer',
           minWidth: 180,
           boxShadow: '0 4px 24px #ffd1dc55',
           transition: 'box-shadow 0.18s, background 0.18s',
-          zIndex: 100,
+          zIndex: 3000,
           animation: 'pop-in 0.5s cubic-bezier(.4,2,.6,.9)',
         }}
       >
