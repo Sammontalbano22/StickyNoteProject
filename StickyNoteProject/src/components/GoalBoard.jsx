@@ -19,7 +19,7 @@ const TRASH_ICON = (
   </svg>
 );
 
-const GoalBoard = ({ notes, onDropNote, onDeleteNote }) => {
+const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote }) => {
   const [dragOver, setDragOver] = useState(false);
   const [draggedIdx, setDraggedIdx] = useState(null);
   const [trashOver, setTrashOver] = useState(false);
@@ -102,7 +102,7 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote }) => {
                 verticalAlign: 'top',
                 minHeight: 120,
                 minWidth: 120,
-                maxWidth: 180,
+                maxWidth: 220,
                 wordBreak: 'break-word',
                 fontFamily: 'Patrick Hand, Comic Sans MS, cursive, sans-serif',
                 fontSize: '1.1em',
@@ -115,9 +115,59 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote }) => {
               onDragStart={() => setDraggedIdx(idx)}
               onDragEnd={() => setDraggedIdx(null)}
             >
-              <div style={{ minHeight: 80, whiteSpace: 'pre-line', color: fontColor }}>{note.text}</div>
+              <div style={{ minHeight: 60, whiteSpace: 'pre-line', color: fontColor, textAlign: 'center', width: '100%' }}>{note.text}</div>
               <div style={{ position: 'absolute', bottom: 8, right: 8, fontSize: 13, color: fontColor === '#fff' ? '#fffbe8' : '#555', background: '#fffbe8cc', borderRadius: 4, padding: '2px 6px' }}>
                 {note.category}
+              </div>
+              {/* Milestones Section */}
+              <div style={{ marginTop: 8 }}>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                  {(note.milestones || []).map((ms, msIdx) => (
+                    <li key={msIdx} style={{ display: 'flex', alignItems: 'center', fontSize: '0.72em', textDecoration: ms.checked ? 'line-through' : 'none', opacity: ms.checked ? 0.6 : 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <input
+                        type="checkbox"
+                        checked={!!ms.checked}
+                        onChange={() => {
+                          const updated = [...(note.milestones || [])];
+                          updated[msIdx] = { ...updated[msIdx], checked: !updated[msIdx].checked };
+                          onUpdateNote(idx, { ...note, milestones: updated });
+                        }}
+                        style={{ marginRight: 6 }}
+                      />
+                      {ms.text}
+                      <button
+                        onClick={() => {
+                          const updated = [...(note.milestones || [])];
+                          updated.splice(msIdx, 1);
+                          onUpdateNote(idx, { ...note, milestones: updated });
+                        }}
+                        style={{ marginLeft: 6, color: '#e76f51', background: 'none', border: 'none', cursor: 'pointer', fontSize: 14 }}
+                        title="Delete milestone"
+                      >✕</button>
+                    </li>
+                  ))}
+                </ul>
+                <form
+                  onSubmit={e => {
+                    e.preventDefault();
+                    const input = e.target.elements[`ms-input-${idx}`];
+                    const value = input.value.trim();
+                    if (value) {
+                      const updated = [...(note.milestones || []), { text: value, checked: false }];
+                      onUpdateNote(idx, { ...note, milestones: updated });
+                      input.value = '';
+                    }
+                  }}
+                  style={{ display: 'flex', marginTop: 4 }}
+                >
+                  <input
+                    name={`ms-input-${idx}`}
+                    type="text"
+                    placeholder="Add step/milestone..."
+                    style={{ flex: 1, fontSize: '0.98em', borderRadius: 4, border: '1px solid #ccc', padding: '2px 6px' }}
+                  />
+                  <button type="submit" style={{ marginLeft: 4, fontSize: 15, background: '#b3e5fc', color: '#222', border: 'none', borderRadius: 4, padding: '2px 10px', cursor: 'pointer' }}>+</button>
+                </form>
               </div>
             </div>
           );

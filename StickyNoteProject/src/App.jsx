@@ -45,18 +45,22 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  // Load sticky notes from localStorage on mount
+  // Load sticky notes from localStorage on mount and after login
   useEffect(() => {
-    const savedNotes = localStorage.getItem('stickyNotes');
-    if (savedNotes) {
-      setStickyNotes(JSON.parse(savedNotes));
+    if (isLoggedIn) {
+      const savedNotes = localStorage.getItem('stickyNotes');
+      if (savedNotes) {
+        setStickyNotes(JSON.parse(savedNotes));
+      }
     }
-  }, []);
+  }, [isLoggedIn]);
 
   // Save sticky notes to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem('stickyNotes', JSON.stringify(stickyNotes));
-  }, [stickyNotes]);
+    if (isLoggedIn) {
+      localStorage.setItem('stickyNotes', JSON.stringify(stickyNotes));
+    }
+  }, [stickyNotes, isLoggedIn]);
 
   // Add a sticky note to the board
   const handleDropNote = (note) => {
@@ -78,6 +82,15 @@ function App() {
   // Update categories/colors for sticky notes
   const handleUpdateCategories = (newCategories) => {
     setPadCategories(newCategories);
+  };
+
+  // Update a sticky note (for milestones)
+  const handleUpdateNote = (idx, updatedNote) => {
+    setStickyNotes(prev => {
+      const updated = [...prev];
+      updated[idx] = updatedNote;
+      return updated;
+    });
   };
 
   return (
@@ -120,7 +133,7 @@ function App() {
             </div>
             <div>
               <h2 style={{ fontFamily: 'Patrick Hand, Comic Sans MS, cursive', color: '#4d2600', marginBottom: 8 }}>Goal Board</h2>
-              <GoalBoard notes={stickyNotes} onDropNote={handleDropNote} onDeleteNote={handleDeleteNote} />
+              <GoalBoard notes={stickyNotes} onDropNote={handleDropNote} onDeleteNote={handleDeleteNote} onUpdateNote={handleUpdateNote} />
             </div>
           </div>
         )}

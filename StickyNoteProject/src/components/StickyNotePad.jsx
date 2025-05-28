@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 // Returns white for dark backgrounds, black for light backgrounds
 function getContrastColor(hex) {
@@ -30,9 +30,19 @@ const StickyNotePad = ({ onCreate, padColors: propPadColors, onUpdateCategories 
   const [editCategories, setEditCategories] = useState(false);
   const [categories, setCategories] = useState(propPadColors || defaultPadColors);
   const [pendingCategories, setPendingCategories] = useState([]); // Only used while editing
+  const [showHelp, setShowHelp] = useState(() => {
+    // Show help if not dismissed
+    return localStorage.getItem('stickyNoteHelpDismissed') !== 'true';
+  });
   const textareaRef = useRef(null);
 
-  // When user types, update the current sticky note
+  useEffect(() => {
+    // Show help on mount if not dismissed
+    if (localStorage.getItem('stickyNoteHelpDismissed') !== 'true') {
+      setShowHelp(true);
+    }
+  }, []);
+
   const handleChange = (e) => {
     setCurrentText(e.target.value);
   };
@@ -91,8 +101,53 @@ const StickyNotePad = ({ onCreate, padColors: propPadColors, onUpdateCategories 
     setPendingCategories(prev => prev.map((cat, i) => i === idx ? { ...cat, color: newColor } : cat));
   };
 
+  const handleCloseHelp = () => setShowHelp(false);
+  const handleDontShowAgain = () => {
+    localStorage.setItem('stickyNoteHelpDismissed', 'true');
+    setShowHelp(false);
+  };
+
   return (
     <div style={{ background: 'transparent', boxShadow: 'none', padding: 0, margin: 0 }}>
+      {/* Help UI: show if showHelp is true */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 4 }}>
+        <button
+          aria-label="Sticky Note Help"
+          style={{ background: '#fffbe8', border: '1.5px solid #bbb', borderRadius: 8, fontSize: 18, cursor: 'pointer', padding: '0 10px', height: 32, marginRight: 8 }}
+          onClick={() => setShowHelp(true)}
+          title="How does this work?"
+        >❓</button>
+      </div>
+      {showHelp && (
+        <div style={{
+          background: '#fffbe8',
+          border: '2px solid #f4a261',
+          borderRadius: 12,
+          boxShadow: '0 4px 18px #f4a26122',
+          padding: '1.2em 1.5em',
+          marginBottom: 12,
+          maxWidth: 380,
+          margin: '0 auto 12px auto',
+          position: 'relative',
+          zIndex: 10,
+        }}>
+          <div style={{ fontWeight: 700, fontSize: '1.15em', color: '#b35c00', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span role="img" aria-label="info">📝</span> How to Use Sticky Notes
+          </div>
+          <ul style={{ fontSize: '1em', color: '#4d2600', margin: 0, paddingLeft: 18, lineHeight: 1.6 }}>
+            <li><b>Create:</b> Write your goal in the note pad, pick a color/category, then drag the note onto the board.</li>
+            <li><b>Edit Categories:</b> Click the ✏️ button to rename or recolor categories. Changes apply only when you click Apply.</li>
+            <li><b>Pin/Unpin:</b> Drag notes from the pad to the board to "pin" them. Notes on the board stay until deleted.</li>
+            <li><b>Delete:</b> Drag a note to the trashcan to remove it. Deleted notes are saved and persist until you clear them.</li>
+            <li><b>Colors & Contrast:</b> Font color automatically adjusts for readability based on your note color.</li>
+            <li><b>Persistence:</b> All notes and categories are saved in your browser and restored when you log in again.</li>
+          </ul>
+          <div style={{ display: 'flex', gap: 10, marginTop: 16, justifyContent: 'flex-end' }}>
+            <button onClick={handleCloseHelp} style={{ background: '#ffd1dc', color: '#4d2600', border: 'none', borderRadius: 6, padding: '6px 18px', fontWeight: 600, cursor: 'pointer' }}>Close</button>
+            <button onClick={handleDontShowAgain} style={{ background: '#bbb', color: '#333', border: 'none', borderRadius: 6, padding: '6px 18px', fontWeight: 600, cursor: 'pointer' }}>Don't show again</button>
+          </div>
+        </div>
+      )}
       <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', marginBottom: 8, gap: 12 }}>
         {categories.map((c, idx) => (
           <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginRight: 8, minWidth: 60 }}>
