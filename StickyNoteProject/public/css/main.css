@@ -137,6 +137,28 @@ button:hover {
   display: none !important;
 }
 
+/* Enlarged Sticky Note */
+.sticky-note.enlarged {
+  width: 320px !important;
+  height: 320px !important;
+  min-width: 260px !important;
+  min-height: 260px !important;
+  max-width: 420px !important;
+  font-size: 1.7em !important;
+  z-index: 10 !important;
+  box-shadow: 0 8px 32px #f4a26155 !important;
+  transition: all 0.22s cubic-bezier(.4,2,.6,.9);
+}
+
+.sticky-note.enlarged ul,
+.sticky-note.enlarged li {
+  font-size: 1.1em !important;
+}
+
+.sticky-note.enlarged button {
+  font-size: 1.1em;
+}
+
 /* Counselor style */
 #counselor-message {
   background: #d1f7ff;

@@ -41,6 +41,8 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote }) => {
   const [suggestions, setSuggestions] = useState({}); // {idx: [suggestion, ...]}
   const [loadingSuggestionIdx, setLoadingSuggestionIdx] = useState(null);
   const [activeSuggestionIdx, setActiveSuggestionIdx] = useState(null); // For showing suggestions outside sticky note
+  const [enlargedNotes, setEnlargedNotes] = useState({}); // {idx: true/false}
+  const [milestoneModalIdx, setMilestoneModalIdx] = useState(null);
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -170,31 +172,93 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote }) => {
           }
           const bgColor = note.color || (padColors[note.colorIdx]?.color ?? '#ffe082');
           const fontColor = getContrastYIQ(bgColor);
+          const isEnlarged = !!enlargedNotes[idx];
           return (
             <div
               key={idx}
-              className="sticky-note"
+              className={`sticky-note${isEnlarged ? ' enlarged' : ''}`}
               style={{
                 background: bgColor,
                 color: fontColor,
                 margin: 8,
                 display: 'inline-block',
                 verticalAlign: 'top',
-                minHeight: 120,
-                minWidth: 120,
-                maxWidth: 220,
+                minHeight: isEnlarged ? 260 : 120,
+                minWidth: isEnlarged ? 260 : 120,
+                maxWidth: isEnlarged ? 420 : 220,
+                width: isEnlarged ? 320 : 160,
+                height: isEnlarged ? 320 : 160,
                 wordBreak: 'break-word',
                 fontFamily: 'Patrick Hand, Comic Sans MS, cursive, sans-serif',
-                fontSize: '1.1em',
-                boxShadow: '0 4px 18px #f4a26133',
+                fontSize: isEnlarged ? '1.7em' : '1.1em',
+                boxShadow: isEnlarged ? '0 8px 32px #f4a26155' : '0 4px 18px #f4a26133',
                 position: 'relative',
                 cursor: 'grab',
-                transition: 'color 0.2s',
+                transition: 'all 0.22s cubic-bezier(.4,2,.6,.9)',
+                zIndex: isEnlarged ? 10 : 1,
               }}
               draggable
               onDragStart={() => setDraggedIdx(idx)}
               onDragEnd={() => setDraggedIdx(null)}
             >
+              {/* Enlarge/Shrink button */}
+              <button
+                aria-label={isEnlarged ? 'Shrink sticky note' : 'Enlarge sticky note'}
+                onClick={e => {
+                  e.stopPropagation();
+                  setEnlargedNotes(prev => ({ ...prev, [idx]: !isEnlarged }));
+                }}
+                style={{
+                  position: 'absolute',
+                  top: 8,
+                  left: 8,
+                  zIndex: 20,
+                  background: isEnlarged ? '#ffd1dc' : '#b3e5fc',
+                  color: '#4d2600',
+                  border: 'none',
+                  borderRadius: 8,
+                  fontWeight: 700,
+                  fontSize: isEnlarged ? 22 : 18,
+                  width: isEnlarged ? 38 : 28,
+                  height: isEnlarged ? 38 : 28,
+                  boxShadow: '0 2px 8px #f4a26122',
+                  cursor: 'pointer',
+                  outline: isEnlarged ? '2px solid #f4a261' : 'none',
+                  transition: 'all 0.18s',
+                }}
+                title={isEnlarged ? 'Shrink note' : 'Enlarge note'}
+              >{isEnlarged ? '−' : '+'}</button>
+              {/* View Milestones Button */}
+              <button
+                aria-label="View milestones"
+                onClick={e => {
+                  e.stopPropagation();
+                  setMilestoneModalIdx(idx);
+                }}
+                style={{
+                  position: 'absolute',
+                  top: 8,
+                  right: 8,
+                  zIndex: 20,
+                  background: '#fffbe8',
+                  color: '#4d2600',
+                  border: '1.5px solid #f4a261',
+                  borderRadius: 8,
+                  fontWeight: 700,
+                  fontSize: 18,
+                  width: 28,
+                  height: 28,
+                  boxShadow: '0 2px 8px #f4a26122',
+                  cursor: 'pointer',
+                  outline: 'none',
+                  transition: 'all 0.18s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: 0,
+                }}
+                title="View milestones"
+              >📋</button>
               <div style={{ minHeight: 60, whiteSpace: 'pre-line', color: fontColor, textAlign: 'center', width: '100%' }}>{note.text}</div>
               <div style={{ position: 'absolute', bottom: 8, right: 8, fontSize: 13, color: fontColor === '#fff' ? '#fffbe8' : '#555', background: '#fffbe8cc', borderRadius: 4, padding: '2px 6px' }}>
                 {note.category}
@@ -216,8 +280,20 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote }) => {
               {/* Milestones Section (abbreviated) */}
               <div style={{ marginTop: 8 }}>
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                  {(note.milestones || []).map((ms, msIdx) => (
-                    <li key={msIdx} style={{ display: 'flex', alignItems: 'center', fontSize: '0.72em', textDecoration: ms.checked ? 'line-through' : 'none', opacity: ms.checked ? 0.6 : 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {(note.milestones || []).slice(0, 5).map((ms, msIdx) => (
+                    <li key={msIdx} style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      fontSize: '0.38em', // much smaller font for all states
+                      textDecoration: ms.checked ? 'line-through' : 'none',
+                      opacity: ms.checked ? 0.6 : 1,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      wordBreak: 'normal',
+                      marginBottom: 2, // tighter spacing
+                      maxWidth: isEnlarged ? 270 : 120, // fit within sticky note
+                    }}>
                       <input
                         type="checkbox"
                         checked={!!ms.checked}
@@ -226,42 +302,17 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote }) => {
                           updated[msIdx] = { ...updated[msIdx], checked: !updated[msIdx].checked };
                           onUpdateNote(idx, { ...note, milestones: updated });
                         }}
-                        style={{ marginRight: 6 }}
+                        style={{ marginRight: 4, width: 10, height: 10 }}
                       />
-                      {ms.text}
-                      <button
-                        onClick={() => {
-                          const updated = [...(note.milestones || [])];
-                          updated.splice(msIdx, 1);
-                          onUpdateNote(idx, { ...note, milestones: updated });
-                        }}
-                        style={{ marginLeft: 6, color: '#e76f51', background: 'none', border: 'none', cursor: 'pointer', fontSize: 14 }}
-                        title="Delete milestone"
-                      >✕</button>
+                      <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>{ms.text}</span>
                     </li>
                   ))}
+                  {(note.milestones || []).length > 5 && (
+                    <li style={{ fontSize: '0.38em', color: '#b35c00', textAlign: 'center', marginTop: 2 }}>
+                      …
+                    </li>
+                  )}
                 </ul>
-                <form
-                  onSubmit={e => {
-                    e.preventDefault();
-                    const input = e.target.elements[`ms-input-${idx}`];
-                    const value = input.value.trim();
-                    if (value) {
-                      const updated = [...(note.milestones || []), { text: value, checked: false }];
-                      onUpdateNote(idx, { ...note, milestones: updated });
-                      input.value = '';
-                    }
-                  }}
-                  style={{ display: 'flex', marginTop: 4 }}
-                >
-                  <input
-                    name={`ms-input-${idx}`}
-                    type="text"
-                    placeholder="Add step/milestone..."
-                    style={{ flex: 1, fontSize: '0.98em', borderRadius: 4, border: '1px solid #ccc', padding: '2px 6px' }}
-                  />
-                  <button type="submit" style={{ marginLeft: 4, fontSize: 15, background: '#b3e5fc', color: '#222', border: 'none', borderRadius: 4, padding: '2px 10px', cursor: 'pointer' }}>+</button>
-                </form>
               </div>
             </div>
           );
@@ -294,6 +345,106 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote }) => {
           Drag here to delete
         </div>
       </div>
+      {/* Milestones Modal */}
+      {milestoneModalIdx !== null && notes[milestoneModalIdx] && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.18)',
+          zIndex: 4000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+          onClick={() => setMilestoneModalIdx(null)}
+        >
+          <div
+            style={{
+              background: '#fffbe8',
+              border: '2.5px solid #ffd1dc',
+              borderRadius: 16,
+              boxShadow: '0 8px 32px #f4a26155',
+              minWidth: 320,
+              maxWidth: 420,
+              maxHeight: 420,
+              padding: 24,
+              zIndex: 4100,
+              position: 'relative',
+              fontSize: '1em',
+              color: '#4d2600',
+              overflowY: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ fontWeight: 700, fontSize: '1.1em', marginBottom: 8, textAlign: 'center' }}>Milestones for this Goal</div>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              {(notes[milestoneModalIdx].milestones || []).map((ms, msIdx) => (
+                <li key={msIdx} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  fontSize: '0.98em',
+                  textDecoration: ms.checked ? 'line-through' : 'none',
+                  opacity: ms.checked ? 0.6 : 1,
+                  whiteSpace: 'pre-line',
+                  wordBreak: 'break-word',
+                  marginBottom: 6,
+                }}>
+                  <input
+                    type="checkbox"
+                    checked={!!ms.checked}
+                    onChange={() => {
+                      const updated = [...(notes[milestoneModalIdx].milestones || [])];
+                      updated[msIdx] = { ...updated[msIdx], checked: !updated[msIdx].checked };
+                      onUpdateNote(milestoneModalIdx, { ...notes[milestoneModalIdx], milestones: updated });
+                    }}
+                    style={{ marginRight: 8 }}
+                  />
+                  <span style={{ flex: 1 }}>{ms.text}</span>
+                  <button
+                    onClick={() => {
+                      const updated = [...(notes[milestoneModalIdx].milestones || [])];
+                      updated.splice(msIdx, 1);
+                      onUpdateNote(milestoneModalIdx, { ...notes[milestoneModalIdx], milestones: updated });
+                    }}
+                    style={{ marginLeft: 8, color: '#e76f51', background: 'none', border: 'none', cursor: 'pointer', fontSize: 16 }}
+                    title="Delete milestone"
+                  >✕</button>
+                </li>
+              ))}
+            </ul>
+            <form
+              onSubmit={e => {
+                e.preventDefault();
+                const input = e.target.elements[`ms-input-modal`];
+                const value = input.value.trim();
+                if (value) {
+                  const updated = [...(notes[milestoneModalIdx].milestones || []), { text: value, checked: false }];
+                  onUpdateNote(milestoneModalIdx, { ...notes[milestoneModalIdx], milestones: updated });
+                  input.value = '';
+                }
+              }}
+              style={{ display: 'flex', marginTop: 12 }}
+            >
+              <input
+                name={`ms-input-modal`}
+                type="text"
+                placeholder="Add step/milestone..."
+                style={{ flex: 1, fontSize: '1em', borderRadius: 4, border: '1px solid #ccc', padding: '2px 6px' }}
+              />
+              <button type="submit" style={{ marginLeft: 8, fontSize: 16, background: '#b3e5fc', color: '#222', border: 'none', borderRadius: 4, padding: '2px 10px', cursor: 'pointer' }}>+</button>
+            </form>
+            <button
+              onClick={() => setMilestoneModalIdx(null)}
+              style={{ marginTop: 18, background: '#ffd1dc', color: '#4d2600', border: 'none', borderRadius: 6, fontWeight: 600, fontSize: '1em', padding: '6px 18px', cursor: 'pointer', alignSelf: 'center' }}
+            >Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
