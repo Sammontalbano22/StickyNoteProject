@@ -322,22 +322,23 @@ const App = () => {
         onClick={() => setAdding(true)}
         style={{
           position: 'fixed',
-          left: 0,
-          bottom: 110, // match Virtual Counselor's bottom: 110
+          left: 10,
+          bottom: 110, // match Virtual Counselor's bottom
           top: 'auto',
           transform: 'none',
           background: 'linear-gradient(90deg, #ffe082 80%, #ffd1dc 100%)',
           color: '#b35c00',
           border: '2.5px solid #ffd1dc',
-          borderRadius: '0 18px 18px 0',
+          borderRadius: 22, // all corners fully rounded
           fontWeight: 900,
           fontSize: 22,
+          fontFamily: 'Inter, Segoe UI, Arial, sans-serif', // Modern, bold, non-cursive
           padding: '16px 38px 16px 24px',
           cursor: 'pointer',
           minWidth: 180,
+          zIndex: 3000,
           boxShadow: '0 4px 24px #ffd1dc55',
           transition: 'box-shadow 0.18s, background 0.18s',
-          zIndex: 3000,
           animation: 'pop-in 0.5s cubic-bezier(.4,2,.6,.9)',
         }}
       >

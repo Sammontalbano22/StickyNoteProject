@@ -224,8 +224,43 @@ function App() {
 
   return (
     <>
-      {/* Only show Header and WidgetBar if logged in and not showing welcome sticky */}
       {isLoggedIn && !showWelcomeSticky && <Header onShowShowroom={() => setShowShowroom(true)} />}
+      {/* Place WidgetBar directly below header, spanning full width, horizontal layout */}
+      {isLoggedIn && !showWelcomeSticky && (
+        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '0 0 24px 0', position: 'relative' }}>
+          <WidgetBar goals={[...stickyNotes, ...pinnedGoals]} />
+        </div>
+      )}
+      {/* Fixed Virtual Counselor button at bottom left, flush with screen edge */}
+      {isLoggedIn && !showWelcomeSticky && (
+        <div style={{ position: 'fixed', left: 10, bottom: 32, zIndex: 3000, display: 'flex', justifyContent: 'flex-start', pointerEvents: 'none' }}>
+          <button
+            className="counselor-btn"
+            style={{
+              pointerEvents: 'auto',
+              background: 'linear-gradient(90deg, #ffe082 80%, #ffd1dc 100%)',
+              border: '2.5px solid #ffd1dc',
+              borderRadius: '18px 22px 16px 20px/20px 16px 22px 18px',
+              fontFamily: 'Inter, Segoe UI, Arial, sans-serif',
+              fontSize: 22,
+              color: '#b35c00',
+              fontWeight: 900,
+              padding: '16px 38px 16px 24px',
+              boxShadow: '0 4px 18px #ffd1dc33, 0 2px 0 #fffbe8 inset',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 14,
+              outline: 'none',
+              cursor: 'pointer',
+              transition: 'box-shadow 0.18s, background 0.18s',
+            }}
+            onClick={() => setShowCounselor(show => !show)}
+          >
+            <CounselorDrawing size={36} />
+            <span>Virtual Counselor</span>
+          </button>
+        </div>
+      )}
       <div className="App main-layout">
         {showWelcomeSticky && (
           <div className="welcome-sticky-modal">
@@ -237,15 +272,7 @@ function App() {
         {isLoggedIn && !showWelcomeSticky && (
           <div className="main-content-grid">
             <aside className="sidebar">
-              <div className="sidebar-section">
-                <WidgetBar goals={[...stickyNotes, ...pinnedGoals]} />
-              </div>
-              <div className="sidebar-section">
-                <button className="counselor-btn" onClick={() => setShowCounselor(show => !show)}>
-                  <CounselorDrawing size={36} />
-                  <span>Virtual Counselor</span>
-                </button>
-              </div>
+              {/* Virtual Counselor button removed from sidebar */}
             </aside>
             <main className="main-sections">
               <section className="section-card">
