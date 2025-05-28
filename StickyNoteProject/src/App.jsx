@@ -81,15 +81,8 @@ function App() {
       )}
       {!isLoggedIn && !showWelcomeSticky && <Auth />}
       {isLoggedIn && !showWelcomeSticky && <Header />}
-      {isLoggedIn && !showWelcomeSticky && (
-        <button
-          id="btn-logout"
-          style={{ margin: '1em', display: 'inline-block' }}
-          onClick={() => signOut(auth)}
-        >
-          🚪 Sign Out
-        </button>
-      )}
+      
+      
       <div id="app-content" style={{ display: isLoggedIn && !showWelcomeSticky ? 'block' : 'none' }}>
         <main>
           {/* Goal Creation */}

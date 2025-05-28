@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { auth } from '../js/firebase-init.js';
 import { signOut } from 'firebase/auth';
-import { updateProfile, updatePassword } from 'firebase/auth';
+import ProfileEditSection from './ProfileEditSection.jsx';
+import NatureSVG from './NatureSVG.jsx';
+import AvatarEditor from './AvatarEditor.jsx';
 
 const dicebearStyles = [
   'adventurer', 'avataaars', 'bottts', 'croodles', 'identicon', 'micah', 'miniavs', 'open-peeps', 'personas', 'pixel-art', 'pixel-art-neutral'
@@ -32,6 +34,9 @@ const Header = () => {
   const [sliderTimeout, setSliderTimeout] = useState(null);
   const [showAvatarEdit, setShowAvatarEdit] = useState(false);
   const [flipCount, setFlipCount] = useState(() => Number(localStorage.getItem('sticky_avatar_flip_count') || 0));
+  const [showNature, setShowNature] = useState(false);
+  const [natureAnim, setNatureAnim] = useState(false);
+  const [natureKey, setNatureKey] = useState(0); // for replaying animation
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((u) => setUser(u));
@@ -62,7 +67,7 @@ const Header = () => {
   return (
     <header style={{ position: 'relative', marginBottom: '2.5em', minHeight: 160, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
       {/* Fun sticky notes background, none under the title */}
-      {stickyNotes.map((note, i) => (
+      {stickyNotes.filter(note => note.right === undefined).map((note, i) => (
         <div
           key={i}
           style={{
@@ -74,7 +79,6 @@ const Header = () => {
             borderRadius: '14px 18px 12px 16px/16px 12px 18px 14px',
             boxShadow: '0 4px 18px #f4a26122, 0 2px 0 #fffbe8 inset',
             left: note.left !== undefined ? note.left : undefined,
-            right: note.right !== undefined ? note.right : undefined,
             top: note.top,
             zIndex: note.z,
             transform: `rotate(${note.rotate}deg)${note.translateX ? ` translateX(${note.translateX})` : ''}`,
@@ -83,54 +87,61 @@ const Header = () => {
           aria-hidden="true"
         />
       ))}
+      {/* Optionally render NatureSVG here if needed */}
+      {/* <NatureSVG /> */}
       <div style={{ width: '100%', display: 'flex', justifyContent: 'center', position: 'relative', zIndex: 10 }}>
-        <h1
-          style={{
-            fontFamily: 'Patrick Hand, Comic Sans MS, cursive, sans-serif',
-            fontSize: '2.7em',
-            color: '#4d2600',
-            background: '#ffe082',
-            border: '3.5px dashed #f4a261',
-            borderRadius: '18px 14px 16px 12px/12px 16px 14px 18px',
-            boxShadow: '0 8px 32px #f4a26144, 0 2px 0 #fffbe8 inset',
-            padding: '0.4em 1.7em',
-            margin: '0 auto 0.2em auto',
-            display: 'inline-block',
-            position: 'relative',
-            zIndex: 10,
-            letterSpacing: '1.5px',
-            textShadow: '1px 2px 0 #fffbe8, 2px 4px 8px #f4a26144',
-            transform: 'rotate(-2deg)',
-            animation: 'header-bounce 1.2s',
-            cursor: 'pointer',
-            userSelect: 'none',
-          }}
-          tabIndex={0}
-          title="Welcome to The Sticky Note Project!"
-        >
-          <span role="img" aria-label="sticky note" style={{ marginRight: 10, fontSize: '1.1em' }}>🗒️</span>
-          The Sticky Note Project
-          <span role="img" aria-label="sparkles" style={{ marginLeft: 10, fontSize: '1.1em' }}>✨</span>
-        </h1>
+        <div style={{ position: 'relative', display: 'inline-block' }}>
+          <h1
+            style={{
+              fontFamily: 'Patrick Hand, Comic Sans MS, cursive, sans-serif',
+              fontSize: '2.3em',
+              color: '#4d2600',
+              background: '#ffe082',
+              border: '3.5px solid #f4a261',
+              borderRadius: '12px',
+              boxShadow: '0 6px 20px #f4a26144, 0 2px 0 #fffbe8 inset',
+              padding: '0.32em 1.3em',
+              margin: '0 auto 0.2em auto',
+              display: 'inline-block',
+              position: 'relative',
+              zIndex: 10,
+              letterSpacing: '1.1px',
+              textShadow: '1px 2px 0 #fffbe8, 2px 4px 8px #f4a26144',
+              transform: 'none',
+              animation: 'header-bounce 1.2s',
+              cursor: 'pointer',
+              userSelect: 'none',
+            }}
+            tabIndex={0}
+            title="Welcome to The Sticky Note Project!"
+          >
+            The Sticky Note Project
+          </h1>
+        </div>
         {user && (
           <div style={{ position: 'absolute', right: 0, top: 0, zIndex: 20 }}>
             <button
               onClick={() => setShowProfile((v) => !v)}
               style={{
-                background: '#ffe082',
-                border: '2px solid #f4a261',
-                borderRadius: 18,
+                background: 'linear-gradient(120deg, #b3e5fc 85%, #e1bee7 100%)',
+                border: '3px dashed #4fc3f7',
+                borderRadius: '16px 18px 14px 20px/20px 14px 18px 16px',
                 fontFamily: 'Patrick Hand, Comic Sans MS, cursive, sans-serif',
                 fontSize: '1.1em',
-                color: '#4d2600',
-                padding: '0.4em 1em',
+                color: '#283593',
+                padding: '0.5em 1.2em',
                 marginLeft: 16,
                 cursor: 'pointer',
-                boxShadow: '0 2px 8px #f4a26144',
+                boxShadow: '0 4px 18px #4fc3f799, 0 2px 0 #fffbe8 inset',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 8,
                 minWidth: 0,
+                outline: '2.5px solid #e1bee7',
+                outlineOffset: '2px',
+                opacity: 1,
+                transform: 'none',
+                transition: 'box-shadow 0.2s, border 0.2s, background 0.2s',
               }}
               aria-label="Profile menu"
             >
@@ -153,12 +164,12 @@ const Header = () => {
             {showProfile && (
               <div style={{
                 position: 'absolute', right: 0, top: 48,
-                background: '#fffbe8',
-                border: '2px solid #f4a261',
-                borderRadius: 16,
-                boxShadow: '0 4px 18px #f4a26122',
-                padding: '1em 1.5em 0.5em 1.5em',
-                minWidth: 260,
+                background: 'linear-gradient(135deg, #fffbe8 80%, #ffe082 100%)',
+                border: '3px solid #f4a261',
+                borderRadius: 20,
+                boxShadow: '0 8px 32px #f4a26155, 0 2px 0 #fffbe8 inset, 0 0 0 4px #ffd1dc55',
+                padding: '1.2em 1.7em 0.7em 1.7em',
+                minWidth: 280,
                 zIndex: 100,
                 fontFamily: 'Patrick Hand, Comic Sans MS, cursive, sans-serif',
                 color: '#4d2600',
@@ -166,6 +177,9 @@ const Header = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'flex-start',
+                transition: 'box-shadow 0.2s, border 0.2s, background 0.2s',
+                outline: '2.5px solid #ffd1dc',
+                outlineOffset: '2px',
               }}>
                 <div style={{ fontWeight: 700, fontSize: '1.18em', marginBottom: 2, display: 'flex', alignItems: 'center', gap: 8 }}>
                   <img src={avatarUrl} alt="avatar" style={{ width: 48, height: 48, borderRadius: '50%', background: avatarBg }} />
@@ -196,100 +210,18 @@ const Header = () => {
                     />
                   </div>
                   {showAvatarEdit && (
-                    <>
-                      {/* Avatar style picker */}
-                      <div style={{ margin: '10px 0', width: '100%' }}>
-                        <label style={{ display: 'block', marginBottom: 4 }}>Avatar Style:</label>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-                          {dicebearStyles.map(style => (
-                            <button
-                              key={style}
-                              onClick={() => setAvatarStyle(style)}
-                              style={{
-                                border: avatarStyle === style ? '2.5px solid #f4a261' : '1.5px solid #ccc',
-                                borderRadius: 10,
-                                padding: 2,
-                                background: avatarStyle === style ? '#ffe082' : '#fff',
-                                cursor: 'pointer',
-                                outline: avatarStyle === style ? '2px solid #ffd1dc' : 'none',
-                                boxShadow: avatarStyle === style ? '0 2px 8px #f4a26144' : 'none',
-                              }}
-                              aria-label={style}
-                              title={style}
-                            >
-                              <img
-                                src={`https://api.dicebear.com/8.x/${style}/svg?seed=${encodeURIComponent(avatarSeed)}&r=${avatarStyle === style ? avatarSeed : ''}`}
-                                alt={style}
-                                style={{ width: 36, height: 36, borderRadius: 8, background: '#fffbe8', minHeight: 36, minWidth: 36, opacity: 1, transition: 'opacity 0.2s' }}
-                                onError={e => {
-                                  e.target.onerror = null;
-                                  setTimeout(() => {
-                                    e.target.src = `https://api.dicebear.com/8.x/${style}/svg?seed=${encodeURIComponent(avatarSeed)}&r=${Math.random()}`;
-                                  }, 150);
-                                  setTimeout(() => {
-                                    if (!e.target.complete || e.target.naturalWidth === 0) {
-                                      e.target.src = `data:image/svg+xml,%3Csvg width='36' height='36' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='36' height='36' rx='8' fill='%23ffe082'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' font-size='16' fill='%23f4a261'%3F%3E?%3C/text%3E%3C/svg%3E`;
-                                    }
-                                  }, 500);
-                                }}
-                              />
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                      {/* Avatar seed slider */}
-                      <div style={{ margin: '10px 0', width: '100%' }}>
-                        <label>Avatar: </label>
-                        <input
-                          type="range"
-                          min="1"
-                          max="100"
-                          step="1"
-                          value={parseInt(pendingSeed) || 1}
-                          onChange={e => {
-                            const newSeed = String(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)));
-                            setPendingSeed(newSeed);
-                            if (sliderTimeout) clearTimeout(sliderTimeout);
-                            setSliderTimeout(setTimeout(() => {
-                              setAvatarSeed(newSeed);
-                              setLastAvatarChange(Date.now());
-                            }, 250));
-                          }}
-                          style={{ width: 120, verticalAlign: 'middle' }}
-                        />
-                        <span style={{ marginLeft: 10 }}>{pendingSeed}</span>
-                      </div>
-                      {/* Background color picker */}
-                      <div style={{ margin: '10px 0', width: '100%' }}>
-                        <label>Background: </label>
-                        <input type="color" value={localStorage.getItem('sticky_avatar_bg') || '#fffbe8'} onChange={e => {
-                          localStorage.setItem('sticky_avatar_bg', e.target.value);
-                          document.documentElement.style.setProperty('--avatar-bg', e.target.value);
-                        }} style={{ width: 70, height: 48, border: 'none', background: 'none', verticalAlign: 'middle', borderRadius: 8 }} />
-                      </div>
-                      {/* Flip button */}
-                      <div style={{ margin: '10px 0', width: '100%' }}>
-                        <label>Flip: </label>
-                        <button
-                          type="button"
-                          onClick={() => setFlipCount(f => f + 1)}
-                          style={{
-                            marginLeft: 8,
-                            padding: '0.3em 1em',
-                            borderRadius: 8,
-                            border: '1.5px solid #f4a261',
-                            background: '#ffe082',
-                            color: '#4d2600',
-                            fontFamily: 'inherit',
-                            fontSize: '1em',
-                            cursor: 'pointer',
-                            boxShadow: '0 1px 4px #f4a26122',
-                          }}
-                        >
-                          Mirror
-                        </button>
-                      </div>
-                    </>
+                    <AvatarEditor
+                      avatarStyle={avatarStyle}
+                      setAvatarStyle={setAvatarStyle}
+                      avatarSeed={avatarSeed}
+                      setAvatarSeed={setAvatarSeed}
+                      pendingSeed={pendingSeed}
+                      setPendingSeed={setPendingSeed}
+                      flipCount={flipCount}
+                      setFlipCount={setFlipCount}
+                      sliderTimeout={sliderTimeout}
+                      setSliderTimeout={setSliderTimeout}
+                    />
                   )}
                 </section>
                 <div style={{ width: '100%', borderTop: '1.5px dashed #f4a261', margin: '0.5em 0 0.2em 0' }} />
@@ -331,73 +263,5 @@ const Header = () => {
     </header>
   );
 };
-
-function ProfileEditSection({ user }) {
-  const [name, setName] = useState(user?.displayName || '');
-  const [password, setPassword] = useState('');
-  const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState('');
-
-  const handleSave = async (e) => {
-    e.preventDefault();
-    setSaving(true);
-    setMessage('');
-    try {
-      if (user && name && name !== user.displayName) {
-        await updateProfile(user, { displayName: name });
-        setMessage('Name updated!');
-      }
-      if (user && password) {
-        await updatePassword(user, password);
-        setMessage((msg) => (msg ? msg + ' Password changed!' : 'Password changed!'));
-        setPassword('');
-      }
-    } catch (err) {
-      setMessage('Error: ' + (err.message || 'Could not update profile.'));
-    }
-    setSaving(false);
-  };
-
-  return (
-    <form onSubmit={handleSave} style={{ width: '100%', margin: '10px 0 18px 0', display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <label style={{ fontWeight: 500 }}>Name:</label>
-      <input
-        type="text"
-        value={name}
-        onChange={e => setName(e.target.value)}
-        style={{ padding: '0.4em', borderRadius: 8, border: '1.5px solid #f4a261', fontFamily: 'inherit', fontSize: '1em', background: '#fff' }}
-        placeholder="Enter your name"
-      />
-      <label style={{ fontWeight: 500 }}>New Password:</label>
-      <input
-        type="password"
-        value={password}
-        onChange={e => setPassword(e.target.value)}
-        style={{ padding: '0.4em', borderRadius: 8, border: '1.5px solid #f4a261', fontFamily: 'inherit', fontSize: '1em', background: '#fff' }}
-        placeholder="Change password"
-        autoComplete="new-password"
-      />
-      <button
-        type="submit"
-        disabled={saving}
-        style={{
-          marginTop: 6,
-          padding: '0.5em 1.2em',
-          borderRadius: 8,
-          border: '1.5px solid #f4a261',
-          background: '#ffd1dc',
-          color: '#4d2600',
-          fontFamily: 'inherit',
-          fontSize: '1em',
-          cursor: 'pointer',
-          boxShadow: '0 1px 4px #f4a26122',
-        }}
-      >
-        {saving ? 'Saving...' : 'Save Changes'}
-      </button>
-      {message && <div style={{ color: message.startsWith('Error') ? '#e57373' : '#388e3c', marginTop: 2, fontSize: '0.98em' }}>{message}</div>}
-    </form>
-  );
-}
 
 export default Header;
