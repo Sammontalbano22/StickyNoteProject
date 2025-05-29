@@ -1,0 +1,95 @@
+/* AvatarEditor.css - Styles for AvatarEditor component */
+
+.avatar-editor-section {
+  margin: 10px 0;
+  width: 100%;
+}
+
+.avatar-editor-label {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.avatar-style-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.avatar-style-btn {
+  border: 1.5px solid #ccc;
+  border-radius: 10px;
+  padding: 2px;
+  background: #fff;
+  cursor: pointer;
+  outline: none;
+  box-shadow: none;
+  transition: border 0.2s, background 0.2s, outline 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.avatar-style-btn.selected {
+  border: 2.5px solid #f4a261;
+  background: #ffe082;
+  outline: 2px solid #ffd1dc;
+  box-shadow: 0 2px 8px #f4a26144;
+}
+
+.avatar-style-img {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--avatar-bg, #fffbe8) !important;
+  min-height: 36px;
+  min-width: 36px;
+  opacity: 1;
+  transition: opacity 0.2s;
+  display: block;
+  z-index: 1;
+}
+
+.avatar-style-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--avatar-bg, #fffbe8);
+  border-radius: 8px;
+  z-index: 0;
+}
+
+.avatar-style-btn .avatar-style-img {
+  position: relative;
+  z-index: 1;
+}
+
+.avatar-seed-slider {
+  width: 120px;
+  vertical-align: middle;
+}
+
+.avatar-seed-value {
+  margin-left: 10px;
+}
+
+.avatar-bg-picker {
+  width: 70px;
+  height: 48px;
+  border: none;
+  background: none;
+  vertical-align: middle;
+  border-radius: 8px;
+}
+
+.avatar-flip-btn {
+  margin-left: 8px;
+  padding: 0.3em 1em;
+  border-radius: 8px;
+  border: 1.5px solid #f4a261;
+  background: #ffe082;
+  color: #4d2600;
+  font-family: inherit;
+  font-size: 1em;
+  cursor: pointer;
+  box-shadow: 0 1px 4px #f4a26122;
+}

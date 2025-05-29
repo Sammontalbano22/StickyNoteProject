@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './AvatarEditor.css';
 
 const dicebearStyles = [
   'adventurer', 'avataaars', 'bottts', 'croodles', 'identicon', 'micah', 'miniavs', 'open-peeps', 'personas', 'pixel-art', 'pixel-art-neutral'
@@ -9,29 +10,21 @@ const AvatarEditor = ({ avatarStyle, setAvatarStyle, avatarSeed, setAvatarSeed, 
   return (
     <>
       {/* Avatar style picker */}
-      <div style={{ margin: '10px 0', width: '100%' }}>
-        <label style={{ display: 'block', marginBottom: 4 }}>Avatar Style:</label>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+      <div className="avatar-editor-section">
+        <label className="avatar-editor-label">Avatar Style:</label>
+        <div className="avatar-style-picker">
           {dicebearStyles.map(style => (
             <button
               key={style}
               onClick={() => setAvatarStyle(style)}
-              style={{
-                border: avatarStyle === style ? '2.5px solid #f4a261' : '1.5px solid #ccc',
-                borderRadius: 10,
-                padding: 2,
-                background: avatarStyle === style ? '#ffe082' : '#fff',
-                cursor: 'pointer',
-                outline: avatarStyle === style ? '2px solid #ffd1dc' : 'none',
-                boxShadow: avatarStyle === style ? '0 2px 8px #f4a26144' : 'none',
-              }}
+              className={`avatar-style-btn${avatarStyle === style ? ' selected' : ''}`}
               aria-label={style}
               title={style}
             >
               <img
                 src={`https://api.dicebear.com/8.x/${style}/svg?seed=${encodeURIComponent(avatarSeed)}&r=${avatarStyle === style ? avatarSeed : ''}`}
                 alt={style}
-                style={{ width: 36, height: 36, borderRadius: 8, background: '#fffbe8', minHeight: 36, minWidth: 36, opacity: 1, transition: 'opacity 0.2s' }}
+                className="avatar-style-img"
                 onError={e => {
                   e.target.onerror = null;
                   setTimeout(() => {
@@ -49,7 +42,7 @@ const AvatarEditor = ({ avatarStyle, setAvatarStyle, avatarSeed, setAvatarSeed, 
         </div>
       </div>
       {/* Avatar seed slider */}
-      <div style={{ margin: '10px 0', width: '100%' }}>
+      <div className="avatar-editor-section">
         <label>Avatar: </label>
         <input
           type="range"
@@ -65,36 +58,25 @@ const AvatarEditor = ({ avatarStyle, setAvatarStyle, avatarSeed, setAvatarSeed, 
               setAvatarSeed(newSeed);
             }, 250));
           }}
-          style={{ width: 120, verticalAlign: 'middle' }}
+          className="avatar-seed-slider"
         />
-        <span style={{ marginLeft: 10 }}>{pendingSeed}</span>
+        <span className="avatar-seed-value">{pendingSeed}</span>
       </div>
       {/* Background color picker */}
-      <div style={{ margin: '10px 0', width: '100%' }}>
+      <div className="avatar-editor-section">
         <label>Background: </label>
         <input type="color" value={localStorage.getItem('sticky_avatar_bg') || '#fffbe8'} onChange={e => {
           localStorage.setItem('sticky_avatar_bg', e.target.value);
           document.documentElement.style.setProperty('--avatar-bg', e.target.value);
-        }} style={{ width: 70, height: 48, border: 'none', background: 'none', verticalAlign: 'middle', borderRadius: 8 }} />
+        }} className="avatar-bg-picker" />
       </div>
       {/* Flip button */}
-      <div style={{ margin: '10px 0', width: '100%' }}>
+      <div className="avatar-editor-section">
         <label>Flip: </label>
         <button
           type="button"
           onClick={() => setFlipCount(f => f + 1)}
-          style={{
-            marginLeft: 8,
-            padding: '0.3em 1em',
-            borderRadius: 8,
-            border: '1.5px solid #f4a261',
-            background: '#ffe082',
-            color: '#4d2600',
-            fontFamily: 'inherit',
-            fontSize: '1em',
-            cursor: 'pointer',
-            boxShadow: '0 1px 4px #f4a26122',
-          }}
+          className="avatar-flip-btn"
         >
           Mirror
         </button>

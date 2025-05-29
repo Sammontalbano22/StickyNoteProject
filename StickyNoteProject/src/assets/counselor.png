@@ -1,4 +1,0 @@
-// Placeholder sharp counselor avatar for Virtual Counselor button
-// Replace this file with your own sharp PNG for a custom look.
-import counselorPng from './react.svg';
-export default counselorPng;

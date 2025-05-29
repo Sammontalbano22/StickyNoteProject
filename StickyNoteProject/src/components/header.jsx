@@ -4,6 +4,7 @@ import { signOut } from 'firebase/auth';
 import ProfileEditSection from './ProfileEditSection.jsx';
 import NatureSVG from './NatureSVG.jsx';
 import AvatarEditor from './AvatarEditor.jsx';
+import './AvatarEditor.css';
 
 const dicebearStyles = [
   'adventurer', 'avataaars', 'bottts', 'croodles', 'identicon', 'micah', 'miniavs', 'open-peeps', 'personas', 'pixel-art', 'pixel-art-neutral'

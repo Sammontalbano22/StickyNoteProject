@@ -1,0 +1,443 @@
+/* Auth.css - styles for Auth component */
+
+.auth-title {
+  cursor: pointer;
+  outline: none;
+  transition: outline 0.2s cubic-bezier(.4,2,.6,.9), filter 0.35s cubic-bezier(.4,2,.6,.9), transform 0.35s cubic-bezier(.4,2,.6,.9);
+  background: #fff;
+  color: #4d2600;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px #f4a26122;
+  padding: 0.25em 1.2em;
+  display: inline-block;
+  font-size: 1.25em;
+  padding: 0.38em 2.2em;
+}
+.auth-title.open {
+  outline: 2.5px solid #f4a261;
+  box-shadow: 0 2px 8px #f4a26144;
+}
+.auth-title-span {
+  display: inline-block;
+  transition: transform 0.35s cubic-bezier(.4,2,.6,.9), filter 0.35s cubic-bezier(.4,2,.6,.9);
+}
+.auth-title-span.open {
+  transform: scale(1.04) rotate(-2deg);
+  filter: drop-shadow(0 6px 18px #f4a26144);
+}
+.auth-title-arrow {
+  margin-left: 12px;
+  font-size: 0.7em;
+  vertical-align: middle;
+  opacity: 0.7;
+  transition: transform 0.35s cubic-bezier(.4,2,.6,.9);
+  display: inline-block;
+  transform: rotate(0deg);
+}
+.auth-title-arrow.open {
+  transform: rotate(90deg);
+}
+
+.auth-tip-prompt {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0.2em 0 0.7em 0;
+  background: rgba(255, 224, 130, 0.78);
+  color: #4d2600;
+  border: 1px dashed #f4a261;
+  border-radius: 12px 16px 14px 18px/18px 14px 16px 12px;
+  box-shadow: 0 1px 6px #f4a26118;
+  font-family: 'Patrick Hand', 'Comic Sans MS', cursive, sans-serif;
+  font-size: 1em;
+  padding: 0.45em 1em;
+  gap: 8px;
+  animation: fade-in-pulse 1.2s;
+  cursor: pointer;
+  user-select: none;
+  max-width: 340px;
+  opacity: 0.92;
+  transition: background 0.2s, opacity 0.2s;
+}
+.auth-tip-icon {
+  font-size: 1.1em;
+  margin-right: 4px;
+}
+.auth-tip-text {
+  font-weight: 500;
+}
+.auth-tip-hand {
+  font-size: 1em;
+  margin-left: 4px;
+  opacity: 0.6;
+}
+@keyframes fade-in-pulse {
+  0% { opacity: 0; transform: scale(0.95); }
+  60% { opacity: 1; transform: scale(1.04); }
+  100% { opacity: 0.85; transform: scale(1); }
+}
+
+.login-box {
+  width: 340px;
+  max-width: 98vw;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1em;
+  padding: 2.2em 1.5em 2em 1.5em;
+  background:
+    repeating-linear-gradient(0deg, #fdf6e3 0px, #fdf6e3 32px, #f5e6c8 32px, #f5e6c8 34px),
+    repeating-linear-gradient(90deg, #fdf6e3 0px, #fdf6e3 24px, #e9dcc3 24px, #e9dcc3 26px);
+  border-radius: 18px;
+  box-shadow: 0 6px 32px #f4a26133, 0 2px 0 #fffbe8 inset;
+  border: 2.5px solid #e0cfa3;
+  position: relative;
+  box-sizing: border-box;
+}
+@media (max-width: 600px) {
+  .login-box {
+    width: 98vw;
+    max-width: 98vw;
+    padding: 1.2em 0.5em 1.2em 0.5em;
+    border-radius: 12px;
+    gap: 0.7em;
+  }
+}
+@media (min-width: 600px) {
+  .auth-title {
+    font-size: 1.45em;
+    padding: 0.48em 2.8em;
+  }
+}
+@media (min-width: 900px) {
+  .auth-title {
+    font-size: 1.7em;
+    padding: 0.62em 3.5em;
+  }
+  .login-box {
+    width: 400px;
+    max-width: 420px;
+    padding: 2.5em 2.2em 2.2em 2.2em;
+    gap: 1.3em;
+  }
+}
+@media (min-width: 1200px) {
+  .auth-title {
+    font-size: 2em;
+    padding: 0.8em 4.2em;
+  }
+  .login-box {
+    max-width: 380px;
+  }
+}
+.auth-input {
+  font-size: 1.1em;
+  padding: 0.7em 1em;
+  border-radius: 8px;
+  border: 1.5px solid #bdbdbd;
+  background: #fff;
+  box-shadow: 0 1px 4px #f4a26122;
+  width: 100%;
+  transition: border 0.2s, box-shadow 0.2s;
+  color: #4d2600;
+  box-sizing: border-box;
+}
+.auth-password-wrapper {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  height: 48px;
+}
+.auth-password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1em;
+  color: #b8860b;
+  padding: 0;
+  z-index: 2;
+  height: 32px;
+  width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.auth-forgot-row {
+  width: 100%;
+  text-align: right;
+  margin-top: -0.3em;
+  margin-bottom: 0.2em;
+}
+.auth-forgot-btn {
+  background: none;
+  border: none;
+  color: #b8860b;
+  font-family: 'Patrick Hand', 'Comic Sans MS', cursive, sans-serif;
+  font-size: 0.98em;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  transition: color 0.18s;
+}
+.auth-btn-row {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 1em;
+  margin-top: 8px;
+  position: relative;
+}
+.auth-btn {
+  background: #ffe082;
+  color: #4d2600;
+  border: 2.5px dashed #f4a261;
+  font-weight: 900;
+  font-size: 1.13em;
+  font-family: 'Patrick Hand', 'Comic Sans MS', cursive, sans-serif;
+  box-shadow: 0 6px 18px #f4a26144, 0 2px 0 #fffbe8 inset;
+  cursor: pointer;
+  letter-spacing: 0.7px;
+  outline: none;
+  min-width: 0;
+  width: 48%;
+  user-select: none;
+  transition: box-shadow 0.18s, background 0.18s, transform 0.18s;
+  position: relative;
+  border-radius: 14px 18px 12px 16px/16px 12px 18px 14px;
+  padding: 0.85em 0;
+  transform: rotate(-2.5deg);
+}
+.auth-btn.login {
+  border-radius: 16px 12px 18px 14px/14px 18px 12px 16px;
+  transform: rotate(2.5deg);
+}
+.auth-btn.hover {
+  box-shadow: 0 12px 32px #f4a26155, 0 2px 0 #fffbe8 inset;
+  background: #ffecb3;
+  transform: scale(1.04) rotate(-2.5deg);
+}
+.auth-btn.login.hover {
+  transform: scale(1.04) rotate(2.5deg);
+}
+.auth-btn.active {
+  transform: scale(0.97) rotate(-2.5deg);
+}
+.auth-btn.login.active {
+  transform: scale(0.97) rotate(2.5deg);
+}
+
+.auth-tip-box {
+  margin: 1.2em auto 0 auto;
+  max-width: 340px;
+  background: #fffbe8;
+  border: 2px dashed #f4a261;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px #f4a26122;
+  padding: 1em 1.2em;
+  font-family: 'Patrick Hand', 'Comic Sans MS', cursive, sans-serif;
+  font-size: 1.08em;
+  color: #4d2600;
+  text-align: center;
+  line-height: 1.5;
+  letter-spacing: 0.2px;
+  user-select: none;
+  opacity: 0.97;
+}
+.auth-tip-quote {
+  font-style: italic;
+}
+
+/* --- Spider Animation Styles --- */
+.spider-anim {
+  position: fixed;
+  width: 120px;
+  height: 220px;
+  pointer-events: none;
+  z-index: 1001;
+  transform-origin: 60px 0px;
+}
+.spider-svg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 120px;
+  height: 220px;
+}
+.spider-text {
+  filter: drop-shadow(0 2px 4px #fffbe8);
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  text-shadow: 0 2px 4px #fffbe8;
+  opacity: 0.95;
+  font-style: italic;
+}
+
+/* --- App Description Styles --- */
+.app-description {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  background: #fffbe8;
+  border: 2px solid #f4a261;
+  border-radius: 14px;
+  box-shadow: 0 4px 18px rgba(244,163,97,0.10);
+  padding: 0 1.5em;
+  margin: 0 auto 1.5em auto;
+  max-width: 600px;
+  font-family: 'Patrick Hand', 'Comic Sans MS', cursive, sans-serif;
+  font-size: 1.1em;
+  color: #4d2600;
+  white-space: pre-line;
+  text-align: left;
+  line-height: 1.6;
+  box-sizing: border-box;
+  transition: max-height 0.5s cubic-bezier(.4,2,.6,.9), opacity 0.3s, padding 0.3s;
+}
+.app-description.open {
+  max-height: 340px;
+  opacity: 1;
+  overflow-y: auto;
+  padding: 1.5em;
+}
+@media (max-width: 700px) {
+  .app-description.open {
+    max-width: 98vw;
+    font-size: 1em;
+    padding: 1em 0.5em;
+    max-height: 40vh;
+  }
+}
+@media (min-width: 1000px) {
+  .app-description.open {
+    max-height: 420px;
+  }
+}
+.app-description::-webkit-scrollbar {
+  width: 8px;
+}
+.app-description::-webkit-scrollbar-thumb {
+  background: #f4a261;
+  border-radius: 8px;
+}
+.app-description::-webkit-scrollbar-track {
+  background: #fffbe8;
+  border-radius: 8px;
+}
+
+/* Responsive styles for Auth component */
+@media (max-width: 600px) {
+  .auth-title {
+    font-size: 1.1em;
+    padding: 0.18em 0.7em;
+    border-radius: 10px;
+  }
+  .auth-title-span {
+    font-size: 1em;
+  }
+  .auth-tip-prompt {
+    font-size: 0.98em;
+    padding: 0.35em 0.7em;
+    max-width: 98vw;
+    border-radius: 10px 12px 10px 12px/12px 10px 12px 10px;
+  }
+  .login-box {
+    width: 98vw;
+    max-width: 98vw;
+    padding: 1.2em 0.5em 1.2em 0.5em;
+    border-radius: 12px;
+    gap: 0.7em;
+  }
+  .auth-input {
+    font-size: 1em;
+    padding: 0.6em 0.8em;
+    border-radius: 7px;
+  }
+  .auth-password-wrapper {
+    height: 44px;
+  }
+  .auth-password-toggle {
+    font-size: 1em;
+    height: 28px;
+    width: 28px;
+    right: 6px;
+  }
+  .auth-forgot-row {
+    font-size: 0.95em;
+  }
+  .auth-btn-row {
+    gap: 0.5em;
+    margin-top: 6px;
+  }
+  .auth-btn {
+    font-size: 1em;
+    padding: 0.7em 0;
+    border-radius: 10px 12px 10px 12px/12px 10px 12px 10px;
+    width: 48%;
+    min-width: 0;
+  }
+  .auth-btn.login {
+    border-radius: 12px 10px 12px 10px/10px 12px 10px 12px;
+  }
+  .auth-tip-box {
+    max-width: 98vw;
+    font-size: 1em;
+    padding: 0.7em 0.7em;
+    border-radius: 10px;
+  }
+}
+
+@media (max-width: 400px) {
+  .login-box {
+    max-width: 98vw;
+    padding: 0 1vw;
+  }
+  .auth-btn {
+    font-size: 0.95em;
+    padding: 0.6em 0;
+  }
+  .auth-tip-box {
+    font-size: 0.95em;
+    padding: 0.5em 0.3em;
+  }
+}
+
+@media (min-width: 900px) {
+  .login-box {
+    width: 400px;
+    max-width: 420px;
+    padding: 2.5em 2.2em 2.2em 2.2em;
+    gap: 1.3em;
+  }
+  .auth-tip-box {
+    max-width: 340px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .login-box {
+    max-width: 380px;
+  }
+  .auth-title {
+    font-size: 2em;
+    padding: 0.8em 4.2em;
+  }
+  .auth-tip-box {
+    font-size: 1.13em;
+  }
+}
+
+/* Make sure buttons and inputs are easy to tap on mobile */
+@media (hover: none) and (pointer: coarse) {
+  .auth-btn, .auth-input, .auth-password-toggle {
+    min-height: 44px;
+  }
+}

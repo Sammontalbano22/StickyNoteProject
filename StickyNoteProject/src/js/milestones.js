@@ -222,6 +222,11 @@ async function acceptStep(step, btn) {
   }
 }
 
+// Reject a suggested step and remove it from the UI
+function rejectStep(btn) {
+  btn.parentElement.remove();
+}
+
 // Expose globally
 window.addGoal = addGoal;
 window.loadGoals = loadGoals;
