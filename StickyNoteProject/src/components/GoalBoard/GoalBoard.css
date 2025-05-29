@@ -59,7 +59,7 @@
   min-width: 900px;
   max-width: 900px;
   width: 100%;
-  background: url('https://www.transparenttextures.com/patterns/cork-board.png'), #e0cda9;
+  background: url('../../assets/cardboard.png'), #e0cda9;
   background-size: cover;
 }
 
@@ -67,7 +67,7 @@
   border: 3px dashed #f4a261;
 }
 
-.goalboard-title {
+/* .goalboard-title {
   font-family: 'Patrick Hand', Comic Sans MS, cursive, sans-serif;
   font-weight: 900;
   font-size: 3.4em;
@@ -75,7 +75,7 @@
   margin: 0 0 1em 0;
   text-align: center;
   letter-spacing: 1.2px;
-}
+} */
 
 .goalboard-empty {
   color: #aaa;

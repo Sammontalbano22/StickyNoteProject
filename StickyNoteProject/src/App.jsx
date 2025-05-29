@@ -28,9 +28,20 @@ function App() {
   const [showWidgetBar, setShowWidgetBar] = useState(false);
   const stickyMessage = "I am Accomplishing my Goals!";
 
+  // Log whenever pinnedGoals changes
+  useEffect(() => {
+    console.log('[DEBUG] pinnedGoals updated:', pinnedGoals);
+  }, [pinnedGoals]);
+
+  // Log when completedGoals changes
+  useEffect(() => {
+    console.log('[DEBUG] completedGoals updated:', completedGoals);
+  }, [completedGoals]);
+
   useEffect(() => {
     // Listen for Firebase auth state changes
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      console.log('[DEBUG] Auth state changed. User:', user);
       if (user) {
         setShowWelcomeSticky(true);
         setAnimatedText("");
@@ -62,6 +73,8 @@ function App() {
       if (savedNotes) {
         setStickyNotes(JSON.parse(savedNotes));
       }
+      // Log loading pinned/completed goals from backend/localStorage
+      console.log('[DEBUG] Loading showroom state after login');
     }
   }, [isLoggedIn]);
 
@@ -72,19 +85,41 @@ function App() {
     }
   }, [stickyNotes, isLoggedIn]);
 
-  // Load showroom state from localStorage
+  // Load showroom state from backend on login
   useEffect(() => {
-    const pinned = JSON.parse(localStorage.getItem('showroom_pinnedGoals') || '[]');
-    const completed = JSON.parse(localStorage.getItem('showroom_completedGoals') || '[]');
-    setPinnedGoals(pinned);
-    setCompletedGoals(completed);
-  }, []);
+    if (isLoggedIn) {
+      API.getShowroom().then(res => {
+        let loadedPinned = res && res.pinnedGoals ? res.pinnedGoals : null;
+        let loadedCompleted = res && res.completedGoals ? res.completedGoals : null;
+        // Fallback to localStorage if backend returns nothing
+        if (!loadedPinned || loadedPinned.length === 0) {
+          const localPinned = localStorage.getItem('pinnedGoals');
+          loadedPinned = localPinned ? JSON.parse(localPinned) : [];
+        }
+        if (!loadedCompleted || loadedCompleted.length === 0) {
+          const localCompleted = localStorage.getItem('completedGoals');
+          loadedCompleted = localCompleted ? JSON.parse(localCompleted) : [];
+        }
+        console.log('[DEBUG] Loaded pinnedGoals from backend/localStorage:', loadedPinned);
+        setPinnedGoals(loadedPinned);
+        setCompletedGoals(loadedCompleted);
+      }).catch(() => {
+        // On error, fallback to localStorage
+        const localPinned = localStorage.getItem('pinnedGoals');
+        const localCompleted = localStorage.getItem('completedGoals');
+        console.log('[DEBUG] Backend error, loaded pinnedGoals from localStorage:', localPinned);
+        setPinnedGoals(localPinned ? JSON.parse(localPinned) : []);
+        setCompletedGoals(localCompleted ? JSON.parse(localCompleted) : []);
+      });
+    }
+  }, [isLoggedIn]);
 
-  // Persist showroom state to localStorage
+  // Persist showroom state to backend
   useEffect(() => {
-    localStorage.setItem('showroom_pinnedGoals', JSON.stringify(pinnedGoals));
-    localStorage.setItem('showroom_completedGoals', JSON.stringify(completedGoals));
-  }, [pinnedGoals, completedGoals]);
+    if (isLoggedIn) {
+      API.saveShowroom(pinnedGoals, completedGoals);
+    }
+  }, [pinnedGoals, completedGoals, isLoggedIn]);
 
   // Get coach persona from localStorage
   const [coachPersona, setCoachPersona] = useState(() => localStorage.getItem('coach_persona') || 'cheerleader');
@@ -127,15 +162,32 @@ function App() {
 
   // When a goal is completed and mounted, add to pinnedGoals and remove from board
   const handleMountShowroom = (goal) => {
-    setPinnedGoals(prev => [...prev, { ...goal, completedAt: Date.now() }]);
+    const newPinned = [...pinnedGoals, { ...goal, completedAt: Date.now() }];
+    let newCompleted = completedGoals;
     if (!completedGoals.find(g => g.text === goal.text)) {
-      setCompletedGoals(prev => [...prev, { ...goal, completedAt: Date.now() }]);
+      newCompleted = [...completedGoals, { ...goal, completedAt: Date.now() }];
     }
+    console.log('[DEBUG] Pinning goal:', goal, 'New pinnedGoals:', newPinned);
+    setPinnedGoals(newPinned);
+    setCompletedGoals(newCompleted);
     setStickyNotes(prev => prev.filter(g => g.text !== goal.text));
+    // Save to localStorage immediately
+    localStorage.setItem('pinnedGoals', JSON.stringify(newPinned));
+    localStorage.setItem('completedGoals', JSON.stringify(newCompleted));
+    // Save to backend if logged in
+    if (isLoggedIn) {
+      API.saveShowroom(newPinned, newCompleted);
+    }
   };
   // Unpin from showroom
   const handleUnpin = (idx) => {
-    setPinnedGoals(prev => prev.filter((_, i) => i !== idx));
+    const newPinned = pinnedGoals.filter((_, i) => i !== idx);
+    console.log('[DEBUG] Unpinning goal at idx', idx, 'New pinnedGoals:', newPinned);
+    setPinnedGoals(newPinned);
+    localStorage.setItem('pinnedGoals', JSON.stringify(newPinned));
+    if (isLoggedIn) {
+      API.saveShowroom(newPinned, completedGoals);
+    }
   };
 
   // Handler for VirtualCounselor to create a new goal
@@ -222,6 +274,25 @@ function App() {
     };
   };
 
+  // Load pinnedGoals and completedGoals from localStorage if not logged in or backend fails
+  useEffect(() => {
+    if (!isLoggedIn) {
+      const pinned = localStorage.getItem('pinnedGoals');
+      const completed = localStorage.getItem('completedGoals');
+      console.log('[DEBUG] Not logged in, loading pinnedGoals from localStorage:', pinned);
+      if (pinned) setPinnedGoals(JSON.parse(pinned));
+      if (completed) setCompletedGoals(JSON.parse(completed));
+    }
+  }, [isLoggedIn]);
+
+  // Save pinnedGoals and completedGoals to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('pinnedGoals', JSON.stringify(pinnedGoals));
+  }, [pinnedGoals]);
+  useEffect(() => {
+    localStorage.setItem('completedGoals', JSON.stringify(completedGoals));
+  }, [completedGoals]);
+
   return (
     <>
       {isLoggedIn && !showWelcomeSticky && <Header onShowShowroom={() => setShowShowroom(true)} />}
@@ -303,6 +374,8 @@ function App() {
           <div className="modal-overlay">
             <div className="modal-card">
               <button className="close-btn" onClick={() => setShowShowroom(false)}>Close</button>
+              {/* Log when rendering GoalShowroom */}
+              {console.log('[DEBUG] Rendering GoalShowroom with pinnedGoals:', pinnedGoals)}
               <GoalShowroom pinnedGoals={pinnedGoals} completedGoals={completedGoals} onUnpin={handleUnpin} />
             </div>
           </div>

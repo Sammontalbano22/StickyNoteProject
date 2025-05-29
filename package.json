@@ -9,5 +9,16 @@
     "node-fetch": "^3.3.2",
     "openai": "^4.103.0",
     "path": "^0.12.7"
+  },
+  "scripts": {
+    "server": "node server.js",
+    "client": "cd StickyNoteProject && vite",
+    "dev": "concurrently \"npm run server\" \"npm run client\" --names \"API,WEB\" --prefix-colors \"bgBlue.bold,bgGreen.bold\"",
+    "build": "cd StickyNoteProject && vite build",
+    "preview": "cd StickyNoteProject && vite preview",
+    "lint": "cd StickyNoteProject && eslint ."
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
   }
 }

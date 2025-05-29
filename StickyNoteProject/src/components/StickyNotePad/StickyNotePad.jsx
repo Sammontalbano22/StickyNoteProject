@@ -127,15 +127,7 @@ const StickyNotePad = ({ onCreate, padColors: propPadColors, onUpdateCategories 
       alignSelf: 'flex-start', // If inside a flex container, stick to left
     }}>
       {/* Centered Sticky Note Pad title inside the box */}
-      <h2 style={{
-        fontFamily: 'Patrick Hand, Comic Sans MS, cursive, sans-serif',
-        fontWeight: 900,
-        fontSize: '3.4em',
-        color: '#b35c00',
-        margin: '0 0 1em 0',
-        textAlign: 'center',
-        letterSpacing: '1.2px',
-      }}>
+      <h2 className="goalboard-title">
         Sticky Note Pad
       </h2>
       <div style={{ background: 'transparent', boxShadow: 'none', padding: 0, margin: 0, width: '100%' }}>

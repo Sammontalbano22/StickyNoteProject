@@ -71,4 +71,71 @@ export const API = {
   addEntry: (entry) => fetchWithAuth("http://localhost:3001/add-entry", "POST", entry),
   getJournal: () => fetchWithAuth("http://localhost:3001/journal"),
   getAISteps: (goalText) => postJSON("http://localhost:3001/generate-steps", { goal: goalText }),
+  // Save pinned/completed showroom goals for logged-in users
+  saveShowroom: async (pinnedGoals, completedGoals) => {
+    // Always update localStorage for all users
+    localStorage.setItem('pinnedGoals', JSON.stringify(pinnedGoals));
+    localStorage.setItem('completedGoals', JSON.stringify(completedGoals));
+    const user = auth.currentUser || window.currentUser;
+    if (!user) {
+      // Not signed in, just update localStorage
+      return { status: 'ok', local: true };
+    }
+    try {
+      // Save to backend
+      const result = await fetchWithAuth("http://localhost:3001/save-showroom", "POST", { pinnedGoals, completedGoals });
+      // Always update localStorage for redundancy (already done above)
+      return result;
+    } catch (err) {
+      // On error, fallback to localStorage (already done above)
+      console.error("Error saving showroom:", err);
+      return { status: "error", error: err.message };
+    }
+  },
+  // Get pinned/completed showroom goals for logged-in users
+  getShowroom: async () => {
+    const user = auth.currentUser || window.currentUser;
+    let result;
+    if (!user) {
+      // Not signed in, load from localStorage
+      result = {
+        pinnedGoals: JSON.parse(localStorage.getItem('pinnedGoals') || '[]'),
+        completedGoals: JSON.parse(localStorage.getItem('completedGoals') || '[]'),
+        status: 'ok',
+        local: true
+      };
+      // Always update localStorage with what we load (already from localStorage, but ensures structure)
+      localStorage.setItem('pinnedGoals', JSON.stringify(result.pinnedGoals));
+      localStorage.setItem('completedGoals', JSON.stringify(result.completedGoals));
+      return result;
+    }
+    try {
+      result = await fetchWithAuth("http://localhost:3001/get-showroom");
+      // If backend returns empty, fallback to localStorage
+      if ((!result.pinnedGoals || result.pinnedGoals.length === 0) && localStorage.getItem('pinnedGoals')) {
+        result.pinnedGoals = JSON.parse(localStorage.getItem('pinnedGoals'));
+      }
+      if ((!result.completedGoals || result.completedGoals.length === 0) && localStorage.getItem('completedGoals')) {
+        result.completedGoals = JSON.parse(localStorage.getItem('completedGoals'));
+      }
+      // Always update localStorage with what we load
+      localStorage.setItem('pinnedGoals', JSON.stringify(result.pinnedGoals));
+      localStorage.setItem('completedGoals', JSON.stringify(result.completedGoals));
+      return result;
+    } catch (err) {
+      // On error, fallback to localStorage
+      console.error("Error getting showroom:", err);
+      result = {
+        pinnedGoals: JSON.parse(localStorage.getItem('pinnedGoals') || '[]'),
+        completedGoals: JSON.parse(localStorage.getItem('completedGoals') || '[]'),
+        status: 'error',
+        error: err.message,
+        local: true
+      };
+      // Always update localStorage with what we load
+      localStorage.setItem('pinnedGoals', JSON.stringify(result.pinnedGoals));
+      localStorage.setItem('completedGoals', JSON.stringify(result.completedGoals));
+      return result;
+    }
+  },
 };

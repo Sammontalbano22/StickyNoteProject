@@ -1,0 +1,111 @@
+/* GoalShowroom.css */
+
+.goal-showroom-container {
+  padding: 32px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.goal-showroom-title {
+  font-family: 'Patrick Hand', 'Comic Sans MS', cursive;
+  color: #4d2600;
+  margin-bottom: 18px;
+  font-size: 32px;
+}
+
+.goal-showroom-tabs {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.goal-showroom-tab {
+  background: #fff;
+  color: #b35c00;
+  border: 2px solid #ffd1dc;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 18px;
+  padding: 8px 24px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.goal-showroom-tab.active {
+  background: #ffe082;
+}
+
+.goal-showroom-tab.all {
+  color: #4d2600;
+  border: 2px solid #ffe082;
+}
+
+.goal-showroom-tab.all.active {
+  background: #ffd1dc;
+}
+
+.goal-showroom-section-title {
+  color: #b35c00;
+  margin-bottom: 12px;
+}
+
+.goal-showroom-empty {
+  color: #888;
+  font-style: italic;
+  margin-bottom: 24px;
+}
+
+.goal-showroom-goals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.goal-showroom-goal-card {
+  background: #ffe082;
+  color: #4d2600;
+  border-radius: 18px;
+  box-shadow: 0 4px 18px #f4a26133;
+  padding: 24px;
+  min-width: 220px;
+  max-width: 320px;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.goal-showroom-goal-card.all {
+  background: #b3e5fc;
+  box-shadow: 0 4px 18px #b3e5fc33;
+}
+
+.goal-showroom-goal-title {
+  font-weight: 700;
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.goal-showroom-goal-category {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.goal-showroom-goal-date {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 8px;
+}
+
+.goal-showroom-unpin-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #ffd1dc;
+  color: #b35c00;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 4px 12px;
+  cursor: pointer;
+}

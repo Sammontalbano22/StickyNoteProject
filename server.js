@@ -304,6 +304,30 @@ app.post('/api/ai-suggest-milestones', async (req, res) => {
   }
 });
 
+// ─── Showroom (Pinned/Completed) Goals ─────────────
+app.get('/get-showroom', verifyUser, async (req, res) => {
+  try {
+    const doc = await db.collection('users').doc(req.uid).get();
+    const data = doc.data() || {};
+    res.json({
+      pinnedGoals: data.pinnedGoals || [],
+      completedGoals: data.completedGoals || []
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/save-showroom', verifyUser, async (req, res) => {
+  try {
+    const { pinnedGoals, completedGoals } = req.body;
+    await db.collection('users').doc(req.uid).set({ pinnedGoals, completedGoals }, { merge: true });
+    res.json({ status: 'ok' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ─── Serve Static Frontend ──────────────────────
 app.use(express.static(path.join(__dirname)));
 

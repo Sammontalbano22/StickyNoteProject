@@ -449,6 +449,43 @@ const Auth = ({ onLoginSuccess }) => {
             Log In
           </button>
         </div>
+        {/* Status message for login/signup errors and successes */}
+        {statusMsg && (
+          <div
+            className={
+              'auth-status-msg' +
+              (statusMsg.startsWith('✅') || statusMsg.startsWith('📧')
+                ? ' success'
+                : statusMsg.startsWith('❌')
+                ? ' error'
+                : '')
+            }
+            role="alert"
+            aria-live="assertive"
+            style={{
+              marginTop: '0.7em',
+              marginBottom: '0.2em',
+              textAlign: 'center',
+              fontFamily: "'Patrick Hand', 'Comic Sans MS', cursive, sans-serif",
+              fontSize: '1.08em',
+              color: statusMsg.startsWith('✅') || statusMsg.startsWith('📧') ? '#388e3c' : '#b71c1c',
+              background: statusMsg.startsWith('✅') || statusMsg.startsWith('📧') ? '#e8f5e9' : '#ffebee',
+              border: '1.5px solid ' + (statusMsg.startsWith('✅') || statusMsg.startsWith('📧') ? '#81c784' : '#e57373'),
+              borderRadius: '10px',
+              padding: '0.5em 1em',
+              boxShadow: '0 1px 6px #f4a26118',
+              minHeight: '1.5em',
+              transition: 'all 0.2s',
+              maxWidth: '98%',
+              marginLeft: 'auto',
+              marginRight: 'auto',
+              letterSpacing: '0.2px',
+              opacity: 0.97,
+            }}
+          >
+            {statusMsg}
+          </div>
+        )}
       </div>
       <div className="auth-tip-box" aria-live="polite">
         <span role="img" aria-label="lightbulb" className="auth-tip-icon">💡</span>
