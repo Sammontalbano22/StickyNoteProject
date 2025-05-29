@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import CounselorDrawing from './CounselorDrawing.jsx';
+import CounselorDrawing from "../CounselorDrawing/CounselorDrawing.jsx";
 
 /**
  * VirtualCounselor: A virtual advisor for goal setting and achievement.

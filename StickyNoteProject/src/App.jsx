@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react';
 import './App.css';
 import '/public/css/main.css';
 
-import Header from './components/header.jsx';
-import Auth from './components/auth.jsx';
-import StickyNotePad from './components/StickyNotePad.jsx';
-import GoalBoard from './components/GoalBoard.jsx';
-import GoalShowroom from './components/GoalShowroom';
-import WidgetBar from './components/WidgetBar';
-import VirtualCounselor from './components/VirtualCounselor.jsx';
-import CounselorDrawing from './components/CounselorDrawing.jsx';
+import Header from './components/header/header.jsx';
+import Auth from './components/Auth/Auth.jsx';
+import StickyNotePad from './components/StickyNotePad/StickyNotePad.jsx';
+import GoalBoard from './components/GoalBoard/GoalBoard.jsx';
+import GoalShowroom from './components/GoalShowroom/GoalShowroom.jsx';
+import WidgetBar from './components/WidgetBar/WidgetBar.jsx';
+import VirtualCounselor from './components/VirtualCounselor/VirtualCounselor.jsx';
+import CounselorDrawing from './components/CounselorDrawing/CounselorDrawing.jsx';
 import { API } from './js/api.js';
 
 import { auth } from './js/firebase-init.js';

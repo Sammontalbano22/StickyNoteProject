@@ -1,0 +1,502 @@
+/* GoalBoard.css - Styles for GoalBoard component */
+
+.goalboard-container {
+  min-width: 260px;
+  max-width: 900px;
+  width: 100%;
+  margin-left: 0;
+  margin-right: 1in;
+  margin-top: 0;
+  margin-bottom: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.goalboard-modal-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.18);
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.goalboard-modal {
+  background: #fffbe8;
+  border: 2.5px solid #ffd1dc;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px #f4a26155;
+  min-width: 320px;
+  max-width: 420px;
+  padding: 24px;
+  z-index: 3100;
+  position: relative;
+  font-size: 1em;
+  color: #4d2600;
+}
+
+#sticky-board {
+  border-radius: 18px;
+  border: 4px solid #bfa76a;
+  box-shadow: 0 8px 32px #bfa76a33, 0 2px 0 #fffbe8 inset;
+  position: relative;
+  z-index: 1;
+  padding: 2em 1.5em;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px 16px;
+  align-items: start;
+  justify-items: center;
+  transition: min-width 0.3s, max-width 0.3s;
+  min-height: 500px;
+  min-width: 900px;
+  max-width: 900px;
+  width: 100%;
+  background: url('https://www.transparenttextures.com/patterns/cork-board.png'), #e0cda9;
+  background-size: cover;
+}
+
+#sticky-board.drag-over {
+  border: 3px dashed #f4a261;
+}
+
+.goalboard-title {
+  font-family: 'Patrick Hand', Comic Sans MS, cursive, sans-serif;
+  font-weight: 900;
+  font-size: 3.4em;
+  color: #b35c00;
+  margin: 0 0 1em 0;
+  text-align: center;
+  letter-spacing: 1.2px;
+}
+
+.goalboard-empty {
+  color: #aaa;
+  font-style: italic;
+  text-align: center;
+  margin-top: 40px;
+  grid-column: 1 / -1;
+}
+
+.sticky-note {
+  margin: 8px;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  vertical-align: top;
+  min-height: 120px;
+  min-width: 120px;
+  max-width: 220px;
+  width: 160px;
+  height: 160px;
+  word-break: break-word;
+  font-family: 'Patrick Hand', Comic Sans MS, cursive, sans-serif;
+  font-size: 1.1em;
+  box-shadow: 0 4px 18px #f4a26133;
+  position: relative;
+  cursor: grab;
+  transition: all 0.22s cubic-bezier(.4,2,.6,.9);
+  z-index: 1;
+  border-radius: 18px;
+  padding: 12px 12px 10px 12px;
+  overflow: auto;
+}
+
+.sticky-note.enlarged {
+  min-height: 260px;
+  min-width: 260px;
+  max-width: 420px;
+  width: 320px;
+  height: 320px;
+  font-size: 1.7em;
+  box-shadow: 0 8px 32px #f4a26155;
+  padding: 18px 18px 16px 18px;
+}
+
+.sticky-note-category {
+  font-size: 11px;
+  color: #555;
+  background: #fffbe8cc;
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border: 1px solid #ffe082;
+  box-shadow: 0 1px 2px #ffd1dc22;
+  line-height: 1.2;
+  margin-right: 4px;
+  margin-left: 0;
+  display: inline-block;
+}
+
+.sticky-note.enlarged .sticky-note-category {
+  font-size: 14px;
+  max-width: 120px;
+  padding: 2px 10px;
+}
+
+.sticky-note-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.sticky-note-action-btn {
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 18px;
+  width: 32px;
+  height: 32px;
+  box-shadow: 0 2px 8px #f4a26122;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1.5px solid #f4a261;
+}
+
+.sticky-note-action-btn.enlarged {
+  background: #ffd1dc;
+  color: #4d2600;
+  outline: 2px solid #f4a261;
+}
+
+.sticky-note-action-btn:not(.enlarged) {
+  background: #b3e5fc;
+  color: #4d2600;
+}
+
+.sticky-note-main-text {
+  min-height: 60px;
+  text-align: left;
+  width: 100%;
+  margin-bottom: 8px;
+  font-weight: 500;
+  line-height: 1.25;
+  background: rgba(255,255,255,0.08);
+  border-radius: 8px;
+  box-shadow: 0 1px 4px #ffd1dc11;
+  overflow: auto;
+  text-overflow: unset;
+  white-space: pre-line;
+  word-break: break-word;
+  max-height: 48px;
+  color: inherit;
+  padding: 0 1px;
+}
+
+.sticky-note.enlarged .sticky-note-main-text {
+  box-shadow: 0 1px 8px #ffd1dc22;
+  max-height: 120px;
+  padding: 0 2px;
+}
+
+.sticky-note-milestones {
+  margin-top: 4px;
+  margin-bottom: 2px;
+}
+
+.sticky-note-milestones-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+
+.sticky-note.enlarged .sticky-note-milestones-list {
+  gap: 6px;
+}
+
+.sticky-note-milestone-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.55em;
+  background: rgba(255,255,255,0.18);
+  border-radius: 6px;
+  padding: 2px 6px;
+  margin: 0;
+  width: 95%;
+  min-width: 0;
+  max-width: 98%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  box-shadow: 0 1px 4px #ffd1dc22;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s;
+  opacity: 1;
+  text-decoration: none;
+}
+
+.sticky-note-milestone-item.checked {
+  text-decoration: line-through;
+  opacity: 0.6;
+  background: #e0e0e0;
+}
+
+.sticky-note.enlarged .sticky-note-milestone-item {
+  font-size: 0.85em;
+  padding: 4px 10px;
+}
+
+.sticky-note-milestones-list .sticky-note-milestone-ellipsis {
+  font-size: 0.5em;
+  color: #b35c00;
+  text-align: center;
+  margin-top: 2px;
+}
+
+.sticky-note.enlarged .sticky-note-milestones-list .sticky-note-milestone-ellipsis {
+  font-size: 0.8em;
+}
+
+.sticky-note-suggest-btn {
+  font-size: 0.7em;
+  margin: 6px 0;
+  background: #b3e5fc;
+  color: #222;
+  border: none;
+  border-radius: 6px;
+  padding: 2px 10px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 1px 4px #b3e5fc33;
+}
+
+.sticky-note.enlarged .sticky-note-suggest-btn {
+  font-size: 1em;
+  padding: 6px 18px;
+}
+
+#sticky-trash {
+  width: 60px;
+  height: 120px;
+  margin-left: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  border: 2px dashed #f4a261;
+  border-radius: 16px;
+  background: #fffbe8;
+  box-shadow: 0 2px 8px #f4a26122;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+#sticky-trash.trash-over {
+  border: 3px solid #b35c00;
+  background: #ffe082;
+  box-shadow: 0 0 16px #f4a26188;
+}
+
+#sticky-trash-icon {
+  margin-top: 18px;
+}
+
+#sticky-trash-label {
+  font-size: 13px;
+  color: #b35c00;
+  margin-top: 8px;
+  text-align: center;
+}
+
+#sticky-trash-desc {
+  font-size: 11px;
+  color: #b35c00;
+  margin-top: 2px;
+  text-align: center;
+  opacity: 0.7;
+}
+
+/* Modal styles for milestones, enlarged milestone, and congratulations */
+.goalboard-milestone-modal-bg,
+.goalboard-enlarged-ms-modal-bg,
+.goalboard-congrats-modal-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.18);
+  z-index: 4000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.goalboard-milestone-modal,
+.goalboard-enlarged-ms-modal,
+.goalboard-congrats-modal {
+  background: #fffbe8;
+  border: 2.5px solid #ffd1dc;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px #f4a26155;
+  min-width: 380px;
+  max-width: 600px;
+  width: 90vw;
+  max-height: 540px;
+  padding: 32px;
+  z-index: 4100;
+  position: relative;
+  font-size: 1.08em;
+  color: #4d2600;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  box-sizing: border-box;
+}
+
+.goalboard-enlarged-ms-modal {
+  min-width: 320px;
+  max-width: 480px;
+  max-height: 340px;
+  font-size: 1.15em;
+  align-items: center;
+  justify-content: center;
+}
+
+.goalboard-congrats-modal {
+  border: 3px solid #ffd1dc;
+  border-radius: 22px;
+  min-width: 340px;
+  max-width: 480px;
+  padding: 36px;
+  font-size: 1.18em;
+  align-items: center;
+  text-align: center;
+}
+
+.goalboard-congrats-modal .goalboard-congrats-title {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+
+.goalboard-congrats-modal .goalboard-congrats-header {
+  font-weight: 800;
+  font-size: 1.3em;
+  margin-bottom: 10px;
+}
+
+.goalboard-congrats-modal .goalboard-congrats-goal {
+  font-weight: 700;
+  font-size: 1.1em;
+  margin-bottom: 18px;
+  color: #44bba4;
+}
+
+.goalboard-congrats-modal .goalboard-congrats-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  margin-bottom: 18px;
+}
+
+.goalboard-congrats-modal .goalboard-congrats-btn {
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1.08em;
+  padding: 10px 0;
+  cursor: pointer;
+  width: 100%;
+  border: none;
+}
+
+.goalboard-congrats-modal .goalboard-congrats-btn.share {
+  background: #b3e5fc;
+  color: #222;
+}
+.goalboard-congrats-modal .goalboard-congrats-btn.fb {
+  background: #4267B2;
+  color: #fff;
+}
+.goalboard-congrats-modal .goalboard-congrats-btn.reflect {
+  background: #ffd1dc;
+  color: #4d2600;
+}
+.goalboard-congrats-modal .goalboard-congrats-btn.showroom {
+  background: #ffe082;
+  color: #b35c00;
+}
+.goalboard-congrats-modal .goalboard-congrats-btn.delete {
+  background: #e76f51;
+  color: #fff;
+}
+.goalboard-congrats-modal .goalboard-congrats-close {
+  margin-top: 8px;
+  background: #fff;
+  color: #4d2600;
+  border: 1.5px solid #ffd1dc;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1em;
+  padding: 8px 32px;
+  cursor: pointer;
+}
+
+.goalboard-milestone-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.goalboard-milestone-item {
+  display: flex;
+  align-items: center;
+  font-size: 1em;
+  white-space: pre-line;
+  word-break: break-word;
+  margin-bottom: 10px;
+  background: #fff;
+  border-radius: 6px;
+  padding: 8px 12px;
+  box-shadow: 0 1px 4px #ffd1dc33;
+  opacity: 1;
+  text-decoration: none;
+  transition: opacity 0.18s, text-decoration 0.18s;
+}
+.goalboard-milestone-item.checked {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+.goalboard-milestone-checkbox {
+  margin-right: 12px;
+  width: 18px;
+  height: 18px;
+}
+.goalboard-milestone-text {
+  flex: 1;
+  font-size: 1.08em;
+  overflow-wrap: anywhere;
+}
+.goalboard-milestone-delete {
+  margin-left: 12px;
+  color: #e76f51;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+}

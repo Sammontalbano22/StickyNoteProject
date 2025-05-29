@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import HabitTracker from './HabitTracker';
+import HabitTracker from "../HabitTracker/HabitTracker.jsx";
 
 // Default widget types
 const WIDGET_TYPES = [

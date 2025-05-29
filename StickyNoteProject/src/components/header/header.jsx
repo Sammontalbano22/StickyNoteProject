@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { auth } from '../js/firebase-init.js';
+import { auth } from '../../js/firebase-init.js';
 import { signOut } from 'firebase/auth';
-import ProfileEditSection from './ProfileEditSection.jsx';
-import NatureSVG from './NatureSVG.jsx';
-import AvatarEditor from './AvatarEditor.jsx';
-import './AvatarEditor.css';
+import ProfileEditSection from '../ProfileEditSection/ProfileEditSection.jsx';
+import NatureSVG from '../NatureSVG/NatureSVG.jsx';
+import AvatarEditor from "../AvatarEditor/AvatarEditor.jsx";
+import "../AvatarEditor/AvatarEditor.css";
 
 const dicebearStyles = [
   'adventurer', 'avataaars', 'bottts', 'croodles', 'identicon', 'micah', 'miniavs', 'open-peeps', 'personas', 'pixel-art', 'pixel-art-neutral'
