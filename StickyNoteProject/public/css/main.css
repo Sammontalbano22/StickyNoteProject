@@ -65,9 +65,10 @@ h1 {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  justify-content: center;
+  justify-content: flex-start; /* <-- FIXED */
   gap: 2em;
 }
+
 
 main {
   display: grid;
@@ -86,12 +87,13 @@ section {
 }
 
 #sticky-board {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1em;
-  padding: 2em 1.5em;
-  min-height: 340px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px 18px;
+  justify-items: center;
+  align-items: start;
   min-width: 340px;
+  min-height: 340px;
   background: url('https://www.transparenttextures.com/patterns/cork-board.png'), #e0cda9;
   background-size: cover;
   border-radius: 18px;
@@ -99,6 +101,7 @@ section {
   box-shadow: 0 8px 32px #bfa76a33, 0 2px 0 #fffbe8 inset;
   position: relative;
   z-index: 1;
+  padding: 2em 1.5em;
 }
 
 /* Ensure sticky note pad is left of goal board */
@@ -199,24 +202,47 @@ section {
   box-shadow: none !important;
   border: none !important;
   font-family: 'Patrick Hand', 'Comic Sans MS', cursive, sans-serif;
-  margin-bottom: 0.5em;
+  margin-bottom: 0.2em; /* reduce space below pad */
   overflow: hidden;
   resize: none;
 }
 
+.note-pad-container {
+
+  background: linear-gradient(120deg, #fffbe8 80%, #ffe082 100%);
+  border-radius: 18px;
+  box-shadow: 0 4px 18px #ffd1dc33, 0 2px 0 #fffbe8 inset;
+  border: 2.5px dashed #f4a261;
+  padding: 1.2em 1em 1em 1em; /* reduce vertical padding */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 380px;
+  max-width: 600px;
+  width: 100%;
+}
+
+.note-pad-container > div {
+  margin-bottom: 6px !important; /* reduce space between children */
+}
+
 .note-pad textarea {
   width: 100%;
-  height: 100%;
+  min-width: 340px;
+  max-width: 560px;
+  height: 120px;
+  min-height: 120px;
   border: none;
   background: transparent;
   resize: none;
   outline: none;
   font-family: 'Patrick Hand', 'Comic Sans MS', cursive, sans-serif;
-  font-size: 1rem;
+  font-size: 1.15rem;
   line-height: 1.4;
   color: #333;
-  padding: 0;
+  padding: 1em 1em 1.5em 1em;
   box-sizing: border-box;
+  margin-bottom: 0.3em;
 }
 
 #suggestions {
@@ -590,9 +616,9 @@ section {
 /* Writing paper background for login page */
 #auth, .login-box {
   background-color: #fffbe8;
-  background-image:
-    repeating-linear-gradient(to bottom, #b3d0f7 0, #b3d0f7 1.5px, transparent 1.5px, transparent 32px),
-    linear-gradient(to right, #ffb6b6 0, #ffb6b6 2.5px, transparent 2.5px, transparent 100%);
+  /* background-image: */
+    /* repeating-linear-gradient(to bottom, #b3d0f7 0, #b3d0f7 1.5px, transparent 1.5px, transparent 32px),
+    linear-gradient(to right, #ffb6b6 0, #ffb6b6 2.5px, transparent 2.5px, transparent 100%); */
   background-size: 100% 32px, 100% 100%;
   background-position: 0 0, 40px 0;
   background-repeat: repeat-y, no-repeat;
@@ -657,13 +683,14 @@ section {
   border-radius: 18px;
   box-shadow: 0 4px 18px #ffd1dc33, 0 2px 0 #fffbe8 inset;
   border: 2.5px dashed #f4a261;
-  padding: 2em 1.5em 1.5em 1.5em;
+  padding: 1.2em 1em 1em 1em; /* reduce vertical padding */
   margin-right: 2em;
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 220px;
-  max-width: 320px;
+  min-width: 380px;
+  max-width: 600px;
+  width: 100%;
 }
 
 /* Remove background from .note-pad so the container shows through */

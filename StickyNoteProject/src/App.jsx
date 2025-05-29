@@ -275,21 +275,28 @@ function App() {
               {/* Virtual Counselor button removed from sidebar */}
             </aside>
             <main className="main-sections">
-              <section className="section-card">
-                <h2>Sticky Note Pad</h2>
-                <StickyNotePad onCreate={handleDropNote} padColors={padCategories} onUpdateCategories={handleUpdateCategories} />
-              </section>
-              <section className="section-card">
-                <h2>Goal Board</h2>
-                <GoalBoard
-                  notes={stickyNotes}
-                  onDropNote={handleDropNote}
-                  onDeleteNote={handleDeleteNote}
-                  onUpdateNote={handleUpdateNote}
-                  onMountShowroom={handleMountShowroom}
-                />
-              </section>
+              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 40, width: '100%' }}>
+                <section className="section-card" style={{ flex: 1, minWidth: 340 }}>
+                  <div style={{ transform: 'translateX(-32px)' }}>
+                    <StickyNotePad
+                      onCreate={handleDropNote}
+                      padColors={padCategories}
+                      onUpdateCategories={handleUpdateCategories}
+                    />
+                  </div>
+                </section>
+                <section className="section-card" style={{ flex: 2, minWidth: 340 }}>
+                  <GoalBoard
+                    notes={stickyNotes}
+                    onDropNote={handleDropNote}
+                    onDeleteNote={handleDeleteNote}
+                    onUpdateNote={handleUpdateNote}
+                    onMountShowroom={handleMountShowroom}
+                  />
+                </section>
+              </div>
             </main>
+
           </div>
         )}
         {showShowroom && (

@@ -142,7 +142,16 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote, onMountShowr
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 32, position: 'relative' }}>
+    <div style={{
+      minWidth: 260,
+      maxWidth: 380,
+      width: '340px',
+      margin: '0 auto',
+      zIndex: 2,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+    }}>
       {/* AI Suggestions Modal/Panel */}
       {activeSuggestionIdx !== null && suggestions[activeSuggestionIdx] && (
         <div style={{
@@ -221,6 +230,7 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote, onMountShowr
               >
               <div style={{ textAlign: 'center', margin: '18px 0 10px 0' }}>
                 <h2 style={{ color: '#b35c00', fontWeight: 800, letterSpacing: 0.5, margin: 0 }}>Goal Board</h2>
+                
               </div>
               {notes.length === 0 && (
                 <div style={{ color: '#aaa', fontStyle: 'italic', textAlign: 'center', marginTop: 40 }}>
