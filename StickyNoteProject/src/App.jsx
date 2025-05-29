@@ -238,7 +238,7 @@ function App() {
             className="counselor-btn"
             style={{
               pointerEvents: 'auto',
-              background: 'linear-gradient(90deg, #ffe082 80%, #ffd1dc 100%)',
+              background: '#ffe082', // changed from gradient to solid yellow
               border: '2.5px solid #ffd1dc',
               borderRadius: '18px 22px 16px 20px/20px 16px 22px 18px',
               fontFamily: 'Inter, Segoe UI, Arial, sans-serif',
@@ -277,13 +277,13 @@ function App() {
             <main className="main-sections">
               <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 40, width: '100%' }}>
                 <section className="section-card" style={{ flex: 1, minWidth: 340 }}>
-                  <div style={{ transform: 'translateX(-32px)' }}>
+                  {/* <div style={{ transform: 'translateX(-32px)' }}> */}
                     <StickyNotePad
                       onCreate={handleDropNote}
                       padColors={padCategories}
                       onUpdateCategories={handleUpdateCategories}
                     />
-                  </div>
+                  {/* </div> */}
                 </section>
                 <section className="section-card" style={{ flex: 2, minWidth: 340 }}>
                   <GoalBoard

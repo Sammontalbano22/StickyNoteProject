@@ -93,26 +93,19 @@ const Header = ({ onShowShowroom }) => {
         <div style={{ position: 'relative', display: 'inline-block' }}>
           <h1
             style={{
-              fontFamily: 'Patrick Hand, Comic Sans MS, cursive, sans-serif',
-              fontSize: '2.3em',
               color: '#4d2600',
-              background: '#ffe082',
-              border: '3.5px solid #f4a261',
-              borderRadius: '12px',
-              boxShadow: '0 6px 20px #f4a26144, 0 2px 0 #fffbe8 inset',
-              padding: '0.32em 1.3em',
-              margin: '0 auto 0.2em auto',
+              borderRadius: 12,
+              boxShadow: '0 1px 4px #f4a26122',
+              padding: '0.25em 1.2em',
               display: 'inline-block',
+              fontFamily: 'Patrick Hand, Comic Sans MS, cursive, sans-serif',
+              fontSize: '4.2em',
+              margin: '0 auto 0.2em auto',
               position: 'relative',
               zIndex: 10,
               letterSpacing: '1.1px',
-              textShadow: '1px 2px 0 #fffbe8, 2px 4px 8px #f4a26144',
-              transform: 'none',
-              animation: 'header-bounce 1.2s',
-              cursor: 'pointer',
               userSelect: 'none',
             }}
-            tabIndex={0}
             title="Welcome to The Sticky Note Project!"
           >
             The Sticky Note Project

@@ -326,7 +326,7 @@ const App = () => {
           bottom: 110, // match Virtual Counselor's bottom
           top: 'auto',
           transform: 'none',
-          background: 'linear-gradient(90deg, #ffe082 80%, #ffd1dc 100%)',
+          background: '#ffe082', // changed from gradient to solid yellow
           color: '#b35c00',
           border: '2.5px solid #ffd1dc',
           borderRadius: 22, // all corners fully rounded
@@ -334,12 +334,14 @@ const App = () => {
           fontSize: 22,
           fontFamily: 'Inter, Segoe UI, Arial, sans-serif', // Modern, bold, non-cursive
           padding: '16px 38px 16px 24px',
+          boxShadow: '0 4px 18px #ffd1dc33, 0 2px 0 #fffbe8 inset',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 14,
+          outline: 'none',
           cursor: 'pointer',
-          minWidth: 180,
-          zIndex: 3000,
-          boxShadow: '0 4px 24px #ffd1dc55',
           transition: 'box-shadow 0.18s, background 0.18s',
-          animation: 'pop-in 0.5s cubic-bezier(.4,2,.6,.9)',
+          zIndex: 4000, // Ensure always on top
         }}
       >
         + Add Widget

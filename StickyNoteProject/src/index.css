@@ -117,3 +117,40 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+@media (max-width: 600px) {
+  :root {
+    font-size: 15px;
+  }
+  body, #root {
+    padding: 0;
+    margin: 0;
+    min-width: 100vw;
+    min-height: 100vh;
+  }
+  h1 {
+    font-size: 1.5rem;
+  }
+  .sticky-bg-note {
+    margin: 0.5rem 0;
+    min-width: 90vw;
+    max-width: 98vw;
+    font-size: 1rem;
+  }
+  .sticky-bg-yellow, .sticky-bg-pink, .sticky-bg-blue, .sticky-bg-green, .sticky-bg-purple {
+    min-width: 90vw;
+    max-width: 98vw;
+  }
+}
+
+@media (max-width: 400px) {
+  :root {
+    font-size: 13px;
+  }
+  h1 {
+    font-size: 1.1rem;
+  }
+  .sticky-bg-note {
+    font-size: 0.95rem;
+  }
+}

@@ -144,13 +144,17 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote, onMountShowr
   return (
     <div style={{
       minWidth: 260,
-      maxWidth: 380,
-      width: '340px',
-      margin: '0 auto',
+      maxWidth: 900,
+      width: '100%',
+      marginLeft: 0, // moved to left edge
+      marginRight: '1in',
+      marginTop: 0,
+      marginBottom: 0,
       zIndex: 2,
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
+      boxSizing: 'border-box',
     }}>
       {/* AI Suggestions Modal/Panel */}
       {activeSuggestionIdx !== null && suggestions[activeSuggestionIdx] && (
@@ -218,22 +222,44 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote, onMountShowr
               id="sticky-board"
               style={{
                 border: dragOver ? '3px dashed #f4a261' : undefined,
-                minHeight: 320,
-                minWidth: 340,
-                background: dragOver ? '#fffbe8' : undefined,
-                transition: 'background 0.2s, border 0.2s',
-                flex: 1,
+                minWidth: 900, // Ensures board is always at least 340px wide
+                maxWidth: 900, // Prevents board from growing wider than 900px
+                width: '100%',
+                background: "url('https://www.transparenttextures.com/patterns/cork-board.png'), #e0cda9",
+                backgroundSize: 'cover',
+                borderRadius: 18,
+                border: '4px solid #bfa76a',
+                boxShadow: '0 8px 32px #bfa76a33, 0 2px 0 #fffbe8 inset',
+                position: 'relative',
+                zIndex: 1,
+                padding: '2em 1.5em',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)', // four columns
+                gap: '18px 16px',
+                alignItems: 'start',
+                justifyItems: 'center',
+                transition: 'min-width 0.3s, max-width 0.3s',
+                minHeight: 500
               }}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               >
-              <div style={{ textAlign: 'center', margin: '18px 0 10px 0' }}>
-                <h2 style={{ color: '#b35c00', fontWeight: 800, letterSpacing: 0.5, margin: 0 }}>Goal Board</h2>
-                
+              <div style={{ gridColumn: '1 / -1', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '18px 0 10px 0' }}>
+                <h2 style={{
+                  fontFamily: 'Patrick Hand, Comic Sans MS, cursive, sans-serif',
+                  fontWeight: 900,
+                  fontSize: '3.4em',
+                  color: '#b35c00',
+                  margin: '0 0 1em 0',
+                  textAlign: 'center',
+                  letterSpacing: '1.2px',
+                }}>
+                  Goal Board
+                </h2>
               </div>
               {notes.length === 0 && (
-                <div style={{ color: '#aaa', fontStyle: 'italic', textAlign: 'center', marginTop: 40 }}>
+                <div style={{ gridColumn: '1 / -1', color: '#aaa', fontStyle: 'italic', textAlign: 'center', marginTop: 40 }}>
                 Drag a sticky note here to add it to your goal board!
                 </div>
               )}

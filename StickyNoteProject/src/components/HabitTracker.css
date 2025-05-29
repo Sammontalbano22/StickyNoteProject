@@ -47,3 +47,26 @@
 .add-habit-form button:hover {
   background: #ffe082;
 }
+
+@media (max-width: 600px) {
+  .habit-tracker-widget {
+    max-width: 98vw;
+    padding: 0.7rem;
+    font-size: 1rem;
+  }
+  .add-habit-form input[type="text"] {
+    font-size: 1rem;
+    padding: 0.2rem 0.3rem;
+  }
+  .add-habit-form button {
+    font-size: 1rem;
+    padding: 0.2rem 0.5rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .habit-tracker-widget {
+    font-size: 0.95rem;
+    padding: 0.4rem;
+  }
+}
