@@ -1,4 +1,5 @@
-
 .env
 auth.json
 .DS_Store
+cert.pem
+key.pem
