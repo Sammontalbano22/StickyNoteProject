@@ -34,6 +34,10 @@ const StickyNotePad = ({ onCreate, padColors: propPadColors, onUpdateCategories 
     // Show help if not dismissed
     return localStorage.getItem('stickyNoteHelpDismissed') !== 'true';
   });
+  const [financeMode, setFinanceMode] = useState(false);
+  const [financeGoalName, setFinanceGoalName] = useState('');
+  const [financeTarget, setFinanceTarget] = useState('');
+  const [financeCurrent, setFinanceCurrent] = useState('');
   const textareaRef = useRef(null);
 
   useEffect(() => {
@@ -49,25 +53,60 @@ const StickyNotePad = ({ onCreate, padColors: propPadColors, onUpdateCategories 
 
   // Drag the sticky note to the board
   const handleDragStart = (e) => {
+    if (financeMode) {
+      if (financeGoalName.trim() && financeTarget && !isNaN(financeTarget)) {
+        e.dataTransfer.setData('text/plain', JSON.stringify({
+          text: financeGoalName,
+          colorIdx: selectedColorIdx,
+          category: categories[selectedColorIdx].label,
+          color: categories[selectedColorIdx].color,
+          isFinance: true,
+          target: Number(financeTarget),
+          current: Number(financeCurrent) || 0,
+          milestones: [], // Always include milestones
+        }));
+        // Don't clear fields on drag, only on drop
+      }
+      return;
+    }
     if (currentText.trim()) {
       e.dataTransfer.setData('text/plain', JSON.stringify({
         text: currentText,
         colorIdx: selectedColorIdx,
         category: categories[selectedColorIdx].label,
-        color: categories[selectedColorIdx].color // Pass the actual color
+        color: categories[selectedColorIdx].color
       }));
-      setCurrentText('');
+      // Don't clear fields on drag, only on drop
     }
   };
 
   // For board drop helper (optional, for compatibility)
   const handleDropToBoard = () => {
+    if (financeMode) {
+      if (financeGoalName.trim() && financeTarget && !isNaN(financeTarget)) {
+        onCreate({
+          text: financeGoalName,
+          colorIdx: selectedColorIdx,
+          category: categories[selectedColorIdx].label,
+          color: categories[selectedColorIdx].color,
+          isFinance: true,
+          target: Number(financeTarget),
+          current: Number(financeCurrent) || 0,
+          milestones: [], // Always include milestones
+        });
+        setFinanceGoalName('');
+        setFinanceTarget('');
+        setFinanceCurrent('');
+        setFinanceMode(false);
+      }
+      return;
+    }
     if (currentText.trim()) {
       onCreate({
         text: currentText,
         colorIdx: selectedColorIdx,
         category: categories[selectedColorIdx].label,
-        color: categories[selectedColorIdx].color // Pass the actual color
+        color: categories[selectedColorIdx].color
       });
       setCurrentText('');
     }
@@ -240,6 +279,75 @@ const StickyNotePad = ({ onCreate, padColors: propPadColors, onUpdateCategories 
             </div>
           </div>
         )}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 10, marginBottom: 12 }}>
+          <button
+            style={{ background: financeMode ? '#44bba4' : '#fffbe8', color: financeMode ? '#fff' : '#333', border: '1.5px solid #bbb', borderRadius: 8, fontWeight: 600, fontSize: 15, padding: '6px 18px', cursor: 'pointer' }}
+            onClick={() => setFinanceMode(f => !f)}
+          >💸 Finance Goal</button>
+        </div>
+        {financeMode ? (
+          <div style={{ width: '100%', marginBottom: 12, background: '#fffbe8', borderRadius: 10, padding: 12, border: '1.5px solid #f4a261' }}>
+            <div style={{ marginBottom: 8 }}>
+              <label style={{ fontWeight: 600, color: '#b35c00' }}>Goal Name:</label>
+              <input
+                type="text"
+                value={financeGoalName}
+                onChange={e => setFinanceGoalName(e.target.value)}
+                placeholder="e.g. Save $500 for a trip"
+                style={{ width: '100%', fontSize: 16, borderRadius: 6, border: '1px solid #ccc', padding: '6px 10px', marginTop: 4 }}
+              />
+            </div>
+            <div style={{ marginBottom: 8, display: 'flex', gap: 10 }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontWeight: 600, color: '#b35c00' }}>Target Amount ($):</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={financeTarget}
+                  onChange={e => setFinanceTarget(e.target.value)}
+                  placeholder="e.g. 500"
+                  style={{ width: '100%', fontSize: 16, borderRadius: 6, border: '1px solid #ccc', padding: '6px 10px', marginTop: 4 }}
+                />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontWeight: 600, color: '#b35c00' }}>Current Saved ($):</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={financeCurrent}
+                  onChange={e => setFinanceCurrent(e.target.value)}
+                  placeholder="e.g. 120"
+                  style={{ width: '100%', fontSize: 16, borderRadius: 6, border: '1px solid #ccc', padding: '6px 10px', marginTop: 4 }}
+                />
+              </div>
+            </div>
+            {/* Visual progress bar */}
+            {financeTarget && !isNaN(financeTarget) && (
+              <div style={{ marginTop: 10 }}>
+                <div style={{ fontWeight: 600, color: '#b35c00', marginBottom: 4 }}>Progress:</div>
+                <div style={{ background: '#ffd1dc', borderRadius: 8, height: 22, width: '100%', position: 'relative', overflow: 'hidden', boxShadow: '0 2px 8px #ffd1dc55' }}>
+                  <div style={{
+                    width: `${Math.min(100, Math.round((Number(financeCurrent) || 0) / Number(financeTarget) * 100))}%`,
+                    background: 'linear-gradient(90deg, #44bba4 60%, #ffe082 100%)',
+                    height: '100%',
+                    borderRadius: 8,
+                    transition: 'width 0.4s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
+                    fontWeight: 700,
+                    color: '#fff',
+                    fontSize: 15,
+                    paddingRight: 10,
+                    boxShadow: '0 2px 8px #44bba455',
+                  }}>
+                    {`${Math.min(100, Math.round((Number(financeCurrent) || 0) / Number(financeTarget) * 100))}%`}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : null}
         <div
           className="sticky-note-real editing writing"
           style={{
@@ -249,7 +357,7 @@ const StickyNotePad = ({ onCreate, padColors: propPadColors, onUpdateCategories 
             zIndex: 2,
             fontFamily: `'Patrick Hand', cursive`,
             boxShadow: '0 8px 32px #f4a26199',
-            cursor: currentText ? 'grab' : 'text',
+            cursor: financeMode ? 'grab' : currentText ? 'grab' : 'text',
             minHeight: '200px',
             minWidth: '200px',
             width: '200px',
@@ -260,31 +368,53 @@ const StickyNotePad = ({ onCreate, padColors: propPadColors, onUpdateCategories 
             position: 'relative',
             margin: '0 auto',
           }}
-          draggable={!!currentText}
-          onDragStart={currentText ? handleDragStart : undefined}
+          draggable={financeMode ? !!financeGoalName && !!financeTarget : !!currentText}
+          onDragStart={financeMode ? (financeGoalName && financeTarget ? handleDragStart : undefined) : (currentText ? handleDragStart : undefined)}
         >
-          <textarea
-            ref={textareaRef}
-            value={currentText}
-            onChange={handleChange}
-            placeholder={`Write your note...\nCategory: ${categories[selectedColorIdx].label}`}
-            rows={6}
-            className="sticky-note-input"
-            style={{
-              fontFamily: 'Patrick Hand, Comic Sans MS, cursive, sans-serif',
-              background: 'transparent',
-              border: 'none',
-              outline: 'none',
-              width: '100%',
-              height: '100%',
-              resize: 'none',
-              fontSize: '1.15em',
-              color: getContrastColor(categories[selectedColorIdx].color),
-              padding: '1em 1em 1.5em 1em',
-              fontWeight: 700, // Make font bold to match board
-            }}
-            autoFocus
-          />
+          {financeMode ? (
+            <div style={{ padding: '1em', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+              <div style={{ fontWeight: 700, fontSize: 20, color: getContrastColor(categories[selectedColorIdx].color), marginBottom: 8 }}>{financeGoalName || 'Finance Goal'}</div>
+              <div style={{ fontSize: 15, color: getContrastColor(categories[selectedColorIdx].color), marginBottom: 8 }}>
+                ${financeCurrent || 0} / ${financeTarget || '?'}
+              </div>
+              {financeTarget && !isNaN(financeTarget) && (
+                <div style={{ width: '100%', marginTop: 6 }}>
+                  <div style={{ background: '#ffd1dc', borderRadius: 8, height: 18, width: '100%', position: 'relative', overflow: 'hidden', boxShadow: '0 2px 8px #ffd1dc55' }}>
+                    <div style={{
+                      width: `${Math.min(100, Math.round((Number(financeCurrent) || 0) / Number(financeTarget) * 100))}%`,
+                      background: 'linear-gradient(90deg, #44bba4 60%, #ffe082 100%)',
+                      height: '100%',
+                      borderRadius: 8,
+                      transition: 'width 0.4s',
+                    }} />
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <textarea
+              ref={textareaRef}
+              value={currentText}
+              onChange={handleChange}
+              placeholder={`Write your note...\nCategory: ${categories[selectedColorIdx].label}`}
+              rows={6}
+              className="sticky-note-input"
+              style={{
+                fontFamily: 'Patrick Hand, Comic Sans MS, cursive, sans-serif',
+                background: 'transparent',
+                border: 'none',
+                outline: 'none',
+                width: '100%',
+                height: '100%',
+                resize: 'none',
+                fontSize: '1.15em',
+                color: getContrastColor(categories[selectedColorIdx].color),
+                padding: '1em 1em 1.5em 1em',
+                fontWeight: 700, // Make font bold to match board
+              }}
+              autoFocus
+            />
+          )}
         </div>
         <div style={{ display: 'none' }} id="sticky-note-drop-helper" onDrop={handleDropToBoard} />
       </div>
