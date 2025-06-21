@@ -195,19 +195,83 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote, onMountShowr
           </div>
         )}
         {notes.map((note, idx) => {
-          // Utility: get contrast color (black or white) for note background
-          function getContrastYIQ(hex) {
-            let c = hex.replace('#', '');
-            if (c.length === 3) c = c.split('').map(x => x + x).join('');
-            const r = parseInt(c.substr(0,2),16);
-            const g = parseInt(c.substr(2,2),16);
-            const b = parseInt(c.substr(4,2),16);
-            const yiq = ((r*299)+(g*587)+(b*114))/1000;
-            return yiq >= 160 ? '#222' : '#fff';
+          if (note.isFinance) {
+            // Finance note rendering
+            const financeBgColor = note.color || (padColors[note.colorIdx]?.color ?? '#ffe082');
+            const financeFontColor = getContrastYIQ(financeBgColor);
+            const financeIsEnlarged = !!enlargedNotes[idx];
+            const percent = note.target ? Math.min(100, Math.round((Number(note.current) || 0) / Number(note.target) * 100)) : 0;
+            return (
+              <div
+                key={idx}
+                className={`sticky-note finance-note${financeIsEnlarged ? ' enlarged' : ''}`}
+                style={{ background: financeBgColor, color: financeFontColor }}
+                draggable
+                onDragStart={() => setDraggedIdx(idx)}
+                onDragEnd={() => setDraggedIdx(null)}
+              >
+                {/* Top bar: Category & Actions */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <span className="sticky-note-category" style={{ color: financeFontColor === '#fff' ? '#fffbe8' : '#555' }}>{note.category || 'Finance'}</span>
+                  <div className="sticky-note-actions">
+                    <button
+                      aria-label={financeIsEnlarged ? 'Shrink sticky note' : 'Enlarge sticky note'}
+                      onClick={e => {
+                        e.stopPropagation();
+                        setEnlargedNotes(prev => ({ ...prev, [idx]: !financeIsEnlarged }));
+                      }}
+                      className={`sticky-note-action-btn${financeIsEnlarged ? ' enlarged' : ''}`}
+                      title={financeIsEnlarged ? 'Shrink note' : 'Enlarge note'}
+                    >{financeIsEnlarged ? '−' : '+'}</button>
+                  </div>
+                </div>
+                {/* Main note text (goal name) */}
+                <div className="sticky-note-main-text" style={{ color: financeFontColor, fontWeight: 700, fontSize: 18, marginBottom: 8 }}>{note.text}</div>
+                {/* Finance progress bar and update - always visible */}
+                <div style={{ marginBottom: 8, fontSize: 15, color: financeFontColor }}>
+                  ${note.current || 0} / ${note.target || '?'}
+                </div>
+                <div style={{ background: '#ffd1dc', borderRadius: 8, height: 18, width: '100%', position: 'relative', overflow: 'hidden', boxShadow: '0 2px 8px #ffd1dc55', marginBottom: 8 }}>
+                  <div style={{
+                    width: `${percent}%`,
+                    background: 'linear-gradient(90deg, #44bba4 60%, #ffe082 100%)',
+                    height: '100%',
+                    borderRadius: 8,
+                    transition: 'width 0.4s',
+                  }} />
+                  <div style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: percent > 50 ? '#fff' : '#b35c00', fontSize: 14 }}>
+                    {percent}%
+                  </div>
+                </div>
+                {/* Update current saved amount */}
+                <form
+                  onSubmit={e => {
+                    e.preventDefault();
+                    const input = e.target.elements[`finance-current-${idx}`];
+                    const value = input.value;
+                    if (!isNaN(value) && value !== '' && Number(value) >= 0) {
+                      onUpdateNote(idx, { ...note, current: Number(value) });
+                    }
+                  }}
+                  style={{ display: 'flex', gap: 4, marginBottom: 8, alignItems: 'center' }}
+                >
+                  <input
+                    name={`finance-current-${idx}`}
+                    type="number"
+                    min="0"
+                    defaultValue={note.current || 0}
+                    style={{ width: 48, fontSize: 13, borderRadius: 3, border: '1px solid #ccc', padding: '2px 6px' }}
+                  />
+                  <button type="submit" style={{ fontSize: 13, background: '#44bba4', color: '#fff', border: 'none', borderRadius: 3, padding: '2px 10px', cursor: 'pointer', fontWeight: 600, minWidth: 0, whiteSpace: 'nowrap' }}>Update</button>
+                </form>
+              </div>
+            );
           }
           const bgColor = note.color || (padColors[note.colorIdx]?.color ?? '#ffe082');
           const fontColor = getContrastYIQ(bgColor);
           const isEnlarged = !!enlargedNotes[idx];
+          // Defensive: ensure milestones is always an array
+          const milestones = Array.isArray(note.milestones) ? note.milestones : [];
           return (
             <div
               key={idx}
@@ -247,7 +311,7 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote, onMountShowr
               {/* Milestones Section (abbreviated) */}
               <div className="sticky-note-milestones">
                 <ul className="sticky-note-milestones-list">
-                  {(note.milestones || []).slice(0, isEnlarged ? 10 : 6).map((ms, msIdx) => (
+                  {milestones.slice(0, isEnlarged ? 10 : 6).map((ms, msIdx) => (
                     <li key={msIdx}
                       className={`sticky-note-milestone-item${ms.checked ? ' checked' : ''}`}
                       onClick={e => {
@@ -271,7 +335,7 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote, onMountShowr
                       <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0, textAlign: 'center' }}>{ms.text}</span>
                     </li>
                   ))}
-                  {(note.milestones || []).length > (isEnlarged ? 10 : 6) && (
+                  {milestones.length > (isEnlarged ? 10 : 6) && (
                     <li className="sticky-note-milestone-ellipsis">…</li>
                   )}
                 </ul>
@@ -403,5 +467,18 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote, onMountShowr
     </div>
   );
 };
+
+// Returns white for dark backgrounds, dark brown for light backgrounds
+function getContrastYIQ(hex) {
+  hex = hex.replace('#', '');
+  if (hex.length === 3) {
+    hex = hex.split('').map(x => x + x).join('');
+  }
+  const r = parseInt(hex.substr(0,2),16);
+  const g = parseInt(hex.substr(2,2),16);
+  const b = parseInt(hex.substr(4,2),16);
+  const yiq = (r*299 + g*587 + b*114) / 1000;
+  return yiq >= 128 ? '#5d4037' : '#fff';
+}
 
 export default GoalBoard;
