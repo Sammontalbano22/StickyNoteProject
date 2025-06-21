@@ -328,6 +328,62 @@ app.post('/save-showroom', verifyUser, async (req, res) => {
   }
 });
 
+// ─── AI Debt Payoff Endpoint ─────────────────────────────
+app.post('/api/ai/debt-payoff', async (req, res) => {
+  const { total, paid, interest, minPayment, months } = req.body;
+  let prompt = `I have a debt payoff goal. Here are the details:\n` +
+    `- Total debt: $${total}\n` +
+    `- Amount already paid: $${paid}\n` +
+    `- Interest rate: ${interest}%\n` +
+    `- Minimum monthly payment: $${minPayment}`;
+  if (months) prompt += `\n- I want to pay it off in about ${months} months.`;
+  prompt += `\n\nPlease provide a step-by-step payoff plan, including:\n` +
+    `1. How long it will take to pay off the debt at the minimum payment.\n` +
+    `2. How much interest I will pay in total.\n` +
+    `3. Suggestions to pay it off faster (e.g., extra payments, snowball/avalanche methods).\n` +
+    `4. Any tips for staying motivated and organized.\n` +
+    `Respond in a friendly, encouraging tone.`;
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4',
+      messages: [
+        { role: 'system', content: 'You are a helpful financial coach.' },
+        { role: 'user', content: prompt }
+      ],
+      max_tokens: 500,
+      temperature: 0.7
+    });
+    const result = completion.choices?.[0]?.message?.content || '';
+
+    // --- Simple payoff plan calculation for frontend graph ---
+    let plan = null;
+    const P = Number(total) - Number(paid || 0);
+    const r = Number(interest) / 100 / 12;
+    const m = Number(minPayment);
+    if (P > 0 && r > 0 && m > 0) {
+      const n = Math.log(m / (m - P * r)) / Math.log(1 + r);
+      const payoffMonths = n > 0 ? Math.ceil(n) : 0;
+      let balances = [];
+      let balance = P;
+      for (let i = 0; i < payoffMonths; i++) {
+        const interestPaid = balance * r;
+        const principalPaid = m - interestPaid;
+        balance = balance - principalPaid;
+        balances.push(Math.max(0, Number(balance.toFixed(2))));
+        if (balance <= 0) break;
+      }
+      plan = {
+        months: payoffMonths,
+        payment: m,
+        balances
+      };
+    }
+    res.json({ result, plan });
+  } catch (e) {
+    res.status(500).json({ error: 'AI error', details: e.message });
+  }
+});
+
 // ─── Serve Static Frontend ──────────────────────
 app.use(express.static(path.join(__dirname)));
 

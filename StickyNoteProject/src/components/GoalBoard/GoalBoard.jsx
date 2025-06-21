@@ -21,6 +21,7 @@ const padColors = [
   { color: '#ffd1dc', label: 'Academic' },
   { color: '#b3e5fc', label: 'Career' },
   { color: '#dcedc8', label: 'Health' },
+  { color: '#44bba4', label: 'Finance' },
   { color: '#e1bee7', label: 'Other' },
 ];
 
@@ -195,24 +196,38 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote, onMountShowr
           </div>
         )}
         {notes.map((note, idx) => {
-          if (note.isFinance) {
+          if (note.category === 'Finance') {
             // Finance note rendering
-            const financeBgColor = note.color || (padColors[note.colorIdx]?.color ?? '#ffe082');
+            const financeBgColor = note.color || '#44bba4';
             const financeFontColor = getContrastYIQ(financeBgColor);
             const financeIsEnlarged = !!enlargedNotes[idx];
             const percent = note.target ? Math.min(100, Math.round((Number(note.current) || 0) / Number(note.target) * 100)) : 0;
+            const progressBarHeight = financeIsEnlarged ? 32 : 18;
             return (
               <div
                 key={idx}
                 className={`sticky-note finance-note${financeIsEnlarged ? ' enlarged' : ''}`}
-                style={{ background: financeBgColor, color: financeFontColor }}
+                style={{ background: financeBgColor, color: financeFontColor, border: '2px solid #388e3c' }}
                 draggable
                 onDragStart={() => setDraggedIdx(idx)}
                 onDragEnd={() => setDraggedIdx(null)}
               >
                 {/* Top bar: Category & Actions */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                  <span className="sticky-note-category" style={{ color: financeFontColor === '#fff' ? '#fffbe8' : '#555' }}>{note.category || 'Finance'}</span>
+                  <span className="sticky-note-category" style={{
+                    color: '#fff',
+                    background: '#388e3c',
+                    borderRadius: 8,
+                    padding: '2px 10px',
+                    fontWeight: 700,
+                    fontSize: 13,
+                    letterSpacing: 0.5,
+                    marginRight: 8,
+                    boxShadow: '0 1px 4px #44bba455',
+                    display: 'inline-block',
+                    minWidth: 60,
+                    textAlign: 'center',
+                  }}>Finance</span>
                   <div className="sticky-note-actions">
                     <button
                       aria-label={financeIsEnlarged ? 'Shrink sticky note' : 'Enlarge sticky note'}
@@ -231,15 +246,15 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote, onMountShowr
                 <div style={{ marginBottom: 8, fontSize: 15, color: financeFontColor }}>
                   ${note.current || 0} / ${note.target || '?'}
                 </div>
-                <div style={{ background: '#ffd1dc', borderRadius: 8, height: 18, width: '100%', position: 'relative', overflow: 'hidden', boxShadow: '0 2px 8px #ffd1dc55', marginBottom: 8 }}>
+                <div style={{ background: '#fffbe8', borderRadius: 8, height: progressBarHeight, width: 'calc(100% - 2px)', position: 'relative', overflow: 'hidden', boxShadow: '0 2px 8px #44bba433', marginBottom: 8, border: '1.5px solid #388e3c', minWidth: 120 }}>
                   <div style={{
                     width: `${percent}%`,
-                    background: 'linear-gradient(90deg, #44bba4 60%, #ffe082 100%)',
+                    background: 'linear-gradient(90deg, #44bba4 60%, #b3e5fc 100%)',
                     height: '100%',
                     borderRadius: 8,
                     transition: 'width 0.4s',
                   }} />
-                  <div style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: percent > 50 ? '#fff' : '#b35c00', fontSize: 14 }}>
+                  <div style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: percent > 50 ? '#fff' : '#388e3c', fontSize: 15 }}>
                     {percent}%
                   </div>
                 </div>
@@ -262,7 +277,7 @@ const GoalBoard = ({ notes, onDropNote, onDeleteNote, onUpdateNote, onMountShowr
                     defaultValue={note.current || 0}
                     style={{ width: 48, fontSize: 13, borderRadius: 3, border: '1px solid #ccc', padding: '2px 6px' }}
                   />
-                  <button type="submit" style={{ fontSize: 13, background: '#44bba4', color: '#fff', border: 'none', borderRadius: 3, padding: '2px 10px', cursor: 'pointer', fontWeight: 600, minWidth: 0, whiteSpace: 'nowrap' }}>Update</button>
+                  <button type="submit" style={{ fontSize: 13, background: '#388e3c', color: '#fff', border: 'none', borderRadius: 3, padding: '2px 10px', cursor: 'pointer', fontWeight: 600, minWidth: 0, whiteSpace: 'nowrap' }}>Update</button>
                 </form>
               </div>
             );

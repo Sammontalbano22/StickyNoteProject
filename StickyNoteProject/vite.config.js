@@ -11,7 +11,7 @@ export default defineConfig({
       cert: fs.readFileSync('./cert.pem'),
     },
     proxy: {
-      '/api': 'https://localhost:3001',
+      '/api': 'http://localhost:3001', // CHANGED from https to http
     },
   },
 })
